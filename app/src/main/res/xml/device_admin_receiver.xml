@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device-admin>
+    <uses-policies>
+        <limit-password/>
+        <watch-login/>
+        <reset-password/>
+        <force-lock/>
+        <wipe-data/>
+        <expire-password/>
+        <encrypted-storage/>
+        <disable-camera/>
+    </uses-policies>
+</device-admin>
+<!--<device-admin xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+<!--    &lt;!&ndash; Password Policies &ndash;&gt;-->
+<!--    &lt;!&ndash; Specifies the minimum length for device passwords &ndash;&gt;-->
+<!--    <uses-policies>-->
+<!--        <limit-password />-->
+<!--        <minimum-password-length value="8" />-->
+<!--        &lt;!&ndash; Defines the quality of passwords required (e.g., alphanumeric, numeric only, etc.) &ndash;&gt;-->
+<!--        <password-quality value="numericComplex" />-->
+<!--        &lt;!&ndash; Sets the maximum number of failed password attempts before wiping the device &ndash;&gt;-->
+<!--        <maximum-failed-password-attempts value="10" />-->
+<!--        &lt;!&ndash; Sets the timeout in seconds before the screen lock requires a password &ndash;&gt;-->
+<!--        <maximum-time-to-lock value="300" />-->
+<!--    </uses-policies>-->
+
+<!--    &lt;!&ndash; Encryption Policies &ndash;&gt;-->
+<!--    &lt;!&ndash; Requires the device to encrypt its storage &ndash;&gt;-->
+<!--    <encryption-requested />-->
+<!--    &lt;!&ndash; Defines the type of encryption to use (e.g., AES256, AES256_CTS, etc.) &ndash;&gt;-->
+<!--    <encryption-algorithm name="AES256" />-->
+
+<!--    &lt;!&ndash; Application Management &ndash;&gt;-->
+<!--    &lt;!&ndash; Disables the camera on the device &ndash;&gt;-->
+<!--    <disable-camera />-->
+<!--    &lt;!&ndash; Disables Bluetooth functionality &ndash;&gt;-->
+<!--    <disable-bluetooth />-->
+<!--    &lt;!&ndash; Disables Wi-Fi functionality &ndash;&gt;-->
+<!--    <disable-wifi />-->
+<!--    &lt;!&ndash; Prevents users from taking screenshots &ndash;&gt;-->
+<!--    <disable-screen-capture />-->
+
+<!--    &lt;!&ndash; Restrictions &ndash;&gt;-->
+<!--    &lt;!&ndash; Prevents users from installing apps from unknown sources &ndash;&gt;-->
+<!--    <disable-install-applications />-->
+<!--    &lt;!&ndash; Prevents users from uninstalling apps &ndash;&gt;-->
+<!--    <disable-uninstall-applications />-->
+<!--    &lt;!&ndash; Specifies a list of apps that are either allowed or disallowed on the device &ndash;&gt;-->
+<!--    &lt;!&ndash; Example: <install-whitelist>com.example.myapp</install-whitelist> &ndash;&gt;-->
+
+<!--    &lt;!&ndash; Network and Connectivity &ndash;&gt;-->
+<!--    &lt;!&ndash; Disables features of the keyguard screen (e.g., camera, widgets, notifications) &ndash;&gt;-->
+<!--    <disable-keyguard-features />-->
+<!--    &lt;!&ndash; Prevents users from expanding the status bar &ndash;&gt;-->
+<!--    <disable-status-bar />-->
+<!--    &lt;!&ndash; Disables SMS messaging functionality &ndash;&gt;-->
+<!--    <disable-sms />-->
+
+<!--    &lt;!&ndash; Monitoring and Reporting &ndash;&gt;-->
+<!--    &lt;!&ndash; Enables or disables certificate transparency monitoring &ndash;&gt;-->
+<!--    <monitoring-certificate-transparency enabled="false" />-->
+<!--    &lt;!&ndash; Enables or disables logging of device history &ndash;&gt;-->
+<!--    <log-history enabled="false" />-->
+
+<!--</device-admin>-->
