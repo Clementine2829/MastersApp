@@ -62,4 +62,22 @@
         android:layout_marginTop="20dp"
         android:text="Set Profile Owner" />
 
+    <Button
+        android:id="@+id/btnNavigateToWorkProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnSetProfileOwner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Work Profiles" />
+
+    <Button
+        android:id="@+id/btnGetProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnNavigateToWorkProfile"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Get Work Profiles" />
+
 </RelativeLayout>
