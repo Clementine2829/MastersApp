@@ -35,6 +35,11 @@ class MainActivity : AppCompatActivity() {
         val btnLockTaskModeEnter = findViewById<Button>(R.id.btnLockTaskModeEnter)
         val btnLockTaskModeExit = findViewById<Button>(R.id.btnLockTaskModeExit)
         val btnSetProfileOwner = findViewById<Button>(R.id.btnSetProfileOwner)
+        val btnNavigateToWorkProfile = findViewById<Button>(R.id.btnNavigateToWorkProfile)
+        val btnGetProfile = findViewById<Button>(R.id.btnGetProfile)
+
+
+        val workProfileManager = WorkProfileManager(this)
 
         btnEnableAdmin.setOnClickListener {
             enableAdmin()
@@ -58,11 +63,26 @@ class MainActivity : AppCompatActivity() {
 //            deviceOwnerReceiver.setupManagedProfile(this)
 
 
-            val workProfileManager = WorkProfileManager(this)
             workProfileManager.createWorkProfile()
 
 
         }
+        btnNavigateToWorkProfile.setOnClickListener {
+            workProfileManager.navigateToWorkProfileSettings()
+        }
+        btnGetProfile.setOnClickListener {
+
+            val profileSelectionDialog = ProfileSelectionDialog(this)
+
+            val user = profileSelectionDialog.show()
+            Toast.makeText(this, "this " + user, Toast.LENGTH_SHORT).show()
+            println("this userL " + user);
+        }
+//
+//        val devicePolicyHelper = DevicePolicyHelper(this)
+//
+//        // Enforce password lock
+//        devicePolicyHelper.enforcePasswordLock()
     }
 
 
