@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">MastersApp</string>
     <string name="profile_name">MastersApp</string>
+    <string name="profile_name_clementine">Clementine </string>
+    <string name="enable_admin">Enable Admin</string>
+    <string name="disable_admin">Disable Admin</string>
+    <string name="lock_task_mode_enter">Lock Task Mode Enter</string>
+    <string name="lock_task_mode_exit">Lock Task Mode Exit</string>
+    <string name="work_profile_status">Work Profile Status</string>
+    <string name="lock_profile">Lock profile</string>
+    <string name="get_work_profiles">Get Work Profiles</string>
+    <string name="work_profiles">Work Profiles</string>
+    <string name="set_profile_owner">Set Profile Owner</string>
+    <string name="set_password_policy">Set password policy</string>
+    <string name="set_work_profile_restrictions">Set work profile restrictions</string>
 </resources>

@@ -1,83 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnEnableAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:text="Enable Admin" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
 
-    <Button
-        android:id="@+id/btnDisableAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnEnableAdmin"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Disable Admin" />
+            <Button
+                android:id="@+id/btnEnableAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:text="@string/enable_admin" />
 
-    <Button
-        android:id="@+id/btnLockTaskModeEnter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnDisableAdmin"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Lock Task Mode Enter" />
+            <Button
+                android:id="@+id/btnDisableAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/disable_admin" />
 
-    <Button
-        android:id="@+id/btnLockTaskModeExit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnLockTaskModeEnter"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Lock Task Mode Exit" />
+            <Button
+                android:id="@+id/btnLockTaskModeEnter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/lock_task_mode_enter" />
 
+            <Button
+                android:id="@+id/btnLockTaskModeExit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/lock_task_mode_exit" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnLockTaskModeExit"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
-        android:text="Work Profile Status"
-        android:textAlignment="center"
-        android:textSize="18sp" />
+            <Button
+                android:id="@+id/btnSetProfileOwner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/set_profile_owner" />
 
-    <Button
-        android:id="@+id/btnSetProfileOwner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Set Profile Owner" />
+            <Button
+                android:id="@+id/btnNavigateToWorkProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/work_profiles" />
 
-    <Button
-        android:id="@+id/btnNavigateToWorkProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnSetProfileOwner"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Work Profiles" />
+            <Button
+                android:id="@+id/btnGetProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/get_work_profiles" />
 
-    <Button
-        android:id="@+id/btnGetProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnNavigateToWorkProfile"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Get Work Profiles" />
+            <Button
+                android:id="@+id/btnLockDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/lock_profile" />
 
-</RelativeLayout>
+            <Button
+                android:id="@+id/btnSetPasswordPolicy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/set_password_policy" />
+
+            <Button
+                android:id="@+id/setWorkProfileRestrictions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/set_work_profile_restrictions" />
+
+        </LinearLayout>
+</ScrollView>
