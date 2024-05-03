@@ -38,6 +38,7 @@ package="co.za.clementine.mastersapp">
             android:resource="@xml/device_admin_receiver"/>
         <intent-filter>
             <action android:name="android.app.action.PROFILE_PROVISIONING_COMPLETE"/>
+<!--            <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />-->
         </intent-filter>
     </receiver>
 </application>

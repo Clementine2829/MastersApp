@@ -8,27 +8,28 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Toast
 import android.widget.Button
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import co.za.clementine.mastersapp.policies.device.DevicePolicies
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var devicePolicyManager: DevicePolicyManager
-    private lateinit var adminReceiver: ComponentName
+    private lateinit var adminComponentName: ComponentName
     private val PROVISIONING_REQUEST_CODE = 123
+    val profileSelectionDialog = ProfileSelectionDialog(this)
 
 
+    companion object {
+        const val RESULT_ENABLE = 1
+    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        checkWorkProfile()
-        checkDeviceOwner(savedInstanceState)
 
         val btnEnableAdmin = findViewById<Button>(R.id.btnEnableAdmin)
         val btnDisableAdmin = findViewById<Button>(R.id.btnDisableAdmin)
@@ -37,9 +38,15 @@ class MainActivity : AppCompatActivity() {
         val btnSetProfileOwner = findViewById<Button>(R.id.btnSetProfileOwner)
         val btnNavigateToWorkProfile = findViewById<Button>(R.id.btnNavigateToWorkProfile)
         val btnGetProfile = findViewById<Button>(R.id.btnGetProfile)
+        val btnLockDevice = findViewById<Button>(R.id.btnLockDevice)
+        val btnSetPasswordPolicy = findViewById<Button>(R.id.btnSetPasswordPolicy)
+        val btnSetWorkProfileRestrictions = findViewById<Button>(R.id.setWorkProfileRestrictions)
+
+        checkDeviceOwner(savedInstanceState)
 
 
         val workProfileManager = WorkProfileManager(this)
+        val devicePolicies = DevicePolicies(this)
 
         btnEnableAdmin.setOnClickListener {
             enableAdmin()
@@ -58,39 +65,40 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnSetProfileOwner.setOnClickListener {
-//            setProfileOwner()
-//            val deviceOwnerReceiver = MyDeviceAdminReceiver()
-//            deviceOwnerReceiver.setupManagedProfile(this)
-
-
             workProfileManager.createWorkProfile()
-
-
         }
         btnNavigateToWorkProfile.setOnClickListener {
             workProfileManager.navigateToWorkProfileSettings()
         }
         btnGetProfile.setOnClickListener {
 
-            val profileSelectionDialog = ProfileSelectionDialog(this)
 
             val user = profileSelectionDialog.show()
             Toast.makeText(this, "this " + user, Toast.LENGTH_SHORT).show()
             println("this userL " + user);
         }
-//
-//        val devicePolicyHelper = DevicePolicyHelper(this)
-//
-//        // Enforce password lock
-//        devicePolicyHelper.enforcePasswordLock()
-    }
 
+        btnLockDevice.setOnClickListener {
+            workProfileManager.lockProfile();
+        }
+
+        btnSetPasswordPolicy.setOnClickListener {
+            devicePolicies.setPasswordPolicy()
+        }
+
+        btnSetWorkProfileRestrictions.setOnClickListener {
+            devicePolicies.setWorkProfileRestrictions()
+        }
+
+
+    }
 
 
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
 
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        adminReceiver = ComponentName(this, DeviceOwnerReceiver::class.java)
+        adminComponentName = ComponentName(this, DeviceOwnerReceiver::class.java)
+
 
         var doMessage = "App's device owner state is unknown"
 
@@ -109,16 +117,16 @@ class MainActivity : AppCompatActivity() {
     }
     private fun enableAdmin() {
         val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminReceiver)
+        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponentName)
         startActivity(intent)
     }
 
     private fun disableAdmin() {
-        devicePolicyManager.removeActiveAdmin(adminReceiver)
+        devicePolicyManager.removeActiveAdmin(adminComponentName)
     }
 
     private fun lockTaskModeEnter() {
-        devicePolicyManager.setLockTaskPackages(adminReceiver, arrayOf(packageName))
+        devicePolicyManager.setLockTaskPackages(adminComponentName, arrayOf(packageName))
         startLockTask()
     }
 
@@ -126,25 +134,7 @@ class MainActivity : AppCompatActivity() {
         stopLockTask()
     }
 
-    private fun checkWorkProfile() {
-        val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        val componentName = ComponentName(this, DeviceOwnerReceiver::class.java)
-
-//        if (devicePolicyManager.isProfileOwnerApp(packageName) && devicePolicyManager.isProfileActive(componentName)) {
-//            // Work profile is enabled
-//            showToast("Work Profile is enabled")
-//        } else {
-//            // Work profile is not enabled
-//            showToast("Work Profile is not enabled")
-//        }
-    }
-
-    private fun setProfileOwner() {
-        val intent = Intent(DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE)
-        intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME, adminReceiver)
-        startActivityForResult(intent, PROVISIONING_REQUEST_CODE)
-    }
-
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PROVISIONING_REQUEST_CODE) {
@@ -169,12 +159,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        devicePolicyManager.setProfileName(adminReceiver, "Your Profile Name")
+        devicePolicyManager.setProfileName(adminComponentName, "Your Profile Name")
         Toast.makeText(this, "Profile owner enabled", Toast.LENGTH_SHORT).show()
-    }
-
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
