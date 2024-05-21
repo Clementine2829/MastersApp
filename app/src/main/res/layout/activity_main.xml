@@ -9,13 +9,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_gravity="center_vertical">
+            android:padding="25dp">
 
             <Button
                 android:id="@+id/btnEnableAdmin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/enable_admin" />
 
             <Button
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/set_profile_owner" />
+                android:text="@string/create_profile_owner" />
 
             <Button
                 android:id="@+id/btnNavigateToWorkProfile"
@@ -59,6 +59,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/get_work_profiles" />
+
+            <Button
+                android:id="@+id/btnSwitchToOwnerProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/switch_to_owner_profile" />
 
             <Button
                 android:id="@+id/btnLockDevice"
@@ -80,6 +87,27 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/set_work_profile_restrictions" />
+
+            <Button
+                android:id="@+id/btnInstallApps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/install_apps" />
+
+            <Button
+                android:id="@+id/btnGetInstalledAppsInWorkProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/get_installed_apps" />
+
+            <Button
+                android:id="@+id/removeDeviceAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/remove_device_admin" />
 
         </LinearLayout>
 </ScrollView>

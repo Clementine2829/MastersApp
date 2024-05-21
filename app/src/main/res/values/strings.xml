@@ -10,7 +10,11 @@
     <string name="lock_profile">Lock profile</string>
     <string name="get_work_profiles">Get Work Profiles</string>
     <string name="work_profiles">Work Profiles</string>
-    <string name="set_profile_owner">Set Profile Owner</string>
+    <string name="create_profile_owner">Create Profile Owner</string>
     <string name="set_password_policy">Set password policy</string>
     <string name="set_work_profile_restrictions">Set work profile restrictions</string>
+    <string name="install_apps">Install Apps</string>
+    <string name="get_installed_apps">Get Installed Apps</string>
+    <string name="remove_device_admin">Remove device admin</string>
+    <string name="switch_to_owner_profile">Switch to owner profile</string>
 </resources>
