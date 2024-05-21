@@ -75,11 +75,11 @@
                 android:text="@string/lock_profile" />
 
             <Button
-                android:id="@+id/btnSetPasswordPolicy"
+                android:id="@+id/btnSetDevicePolicy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/set_password_policy" />
+                android:text="@string/set_device_policies" />
 
             <Button
                 android:id="@+id/setWorkProfileRestrictions"

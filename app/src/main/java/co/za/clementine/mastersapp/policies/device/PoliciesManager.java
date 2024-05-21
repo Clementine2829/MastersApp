@@ -1,9 +1,13 @@
 package co.za.clementine.mastersapp.policies.device;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
@@ -69,7 +73,7 @@ public abstract class PoliciesManager {
         }
     }
 
-    public static boolean arePoliciesApplied() {
+    public static boolean arePoliciesApplied(DevicePolicyManager devicePolicyManager, ComponentName componentName) {
         // Check if the necessary policies are set
         int passwordQuality = devicePolicyManager.getPasswordQuality(componentName);
         int minPasswordLength = devicePolicyManager.getPasswordMinimumLength(componentName);
@@ -95,9 +99,15 @@ public abstract class PoliciesManager {
                 .setTitle("Required Policies")
                 .setMessage(message)
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setNeutralButton("SETTINGS", (dialog, which) -> openDeviceSettings(context))
                 .setCancelable(false)
                 .create()
                 .show();
+    }
+    private static void openDeviceSettings(Context context) {
+        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     public void showToast(String message) {

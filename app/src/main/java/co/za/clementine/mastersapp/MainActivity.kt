@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         val btnGetProfile = findViewById<Button>(R.id.btnGetProfile)
         val btnSwitchToOwnerProfile = findViewById<Button>(R.id.btnSwitchToOwnerProfile)
         val btnLockDevice = findViewById<Button>(R.id.btnLockDevice)
-        val btnSetPasswordPolicy = findViewById<Button>(R.id.btnSetPasswordPolicy)
+        val btnSetDevicePolicy = findViewById<Button>(R.id.btnSetDevicePolicy)
         val btnSetWorkProfileRestrictions = findViewById<Button>(R.id.setWorkProfileRestrictions)
         val btnInstallApps = findViewById<Button>(R.id.btnInstallApps)
         val btnGetInstalledAppsInWorkProfile = findViewById<Button>(R.id.btnGetInstalledAppsInWorkProfile)
@@ -84,17 +84,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnSetProfileOwner.setOnClickListener {
-//            if (arePoliciesApplied()){
+//            if (arePoliciesApplied(devicePolicyManager, adminComponentName)){
                 workProfileManager.createWorkProfile()
 //            } else {
-//                showDialog()
+//                showPolicyDialog(this)
 //            }
         }
         btnNavigateToWorkProfile.setOnClickListener {
             workProfileManager.navigateToWorkProfileSettings()
         }
         btnGetProfile.setOnClickListener {
-//            if (arePoliciesApplied()){
+//            if (arePoliciesApplied(devicePolicyManager, adminComponentName)){
                 profileSelectionDialog.showAndSwitchToWorkProfile()
 //            } else {
 //                showPolicyDialog(this)
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnSwitchToOwnerProfile.setOnClickListener {
-//            if (arePoliciesApplied()){
+//            if (arePoliciesApplied(devicePolicyManager, adminComponentName)){
                 val profileSwitcher = ProfileSwitcher(this);
                 profileSwitcher.switchToAdminProfile();
 //            } else {
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             workProfileManager.lockProfile();
         }
 
-        btnSetPasswordPolicy.setOnClickListener {
+        btnSetDevicePolicy.setOnClickListener {
             DevicePolicies(this);
         }
 
