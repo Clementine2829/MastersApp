@@ -46,11 +46,26 @@ public abstract class PoliciesManager {
         showToast("Max Failed Passwords for Wipe: " + maxFailedPasswordsForWipe);
     }
     public static void removeDeviceAdmin(DevicePolicyManager devicePolicyManager, ComponentName componentName, Context context) {
+//        if (devicePolicyManager.isAdminActive(componentName)) {
+//            devicePolicyManager.removeActiveAdmin(componentName);
+//            showToast(context, "Device admin removed");
+//        } else {
+//            showToast(context, "Device admin not active");
+//        }
         if (devicePolicyManager.isAdminActive(componentName)) {
-            devicePolicyManager.removeActiveAdmin(componentName);
-            showToast(context, "Device admin removed");
-        } else {
-            showToast(context, "Device admin not active");
+            // Reset password policies
+            devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
+//            devicePolicyManager.setPasswordMinimumLength(componentName, 0);
+            devicePolicyManager.setPasswordExpirationTimeout(componentName, 0);
+            devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 0);
+
+            // Reset encryption policy
+            devicePolicyManager.setStorageEncryption(componentName, false);
+
+            // Reset other policies
+            devicePolicyManager.setMaximumTimeToLock(componentName, Long.MAX_VALUE);
+            devicePolicyManager.setCameraDisabled(componentName, false);
+
         }
     }
 
