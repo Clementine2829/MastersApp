@@ -18,6 +18,8 @@ public class DevicePolicies extends PoliciesManager {
         setPasswordSecurityPolicies();
         enforceStorageEncryption();
         verifyPolicies();
+        setScreenTimeoutPolicy(10000); // 10 seconds
+//        setScreenTimeoutPolicy(3000); // 3 seconds
     }
 
 
@@ -38,7 +40,7 @@ public class DevicePolicies extends PoliciesManager {
                 devicePolicyManager.setPasswordExpirationTimeout(componentName, 2L * 60L * 1000L);  // 5 minutes
 
                 // Set maximum failed passwords for wipe
-                devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 3);
+                devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 10);
 
                 showToast("High security policies set");
             } catch (SecurityException e) {
@@ -60,6 +62,16 @@ public class DevicePolicies extends PoliciesManager {
             showToast("Device Admin not active");
         }
     }
+
+    public void setScreenTimeoutPolicy(long timeoutMillis) {
+        if (devicePolicyManager.isAdminActive(componentName)) {
+            devicePolicyManager.setMaximumTimeToLock(componentName, timeoutMillis);
+            showToast("Screen timeout policy set to " + (timeoutMillis / 1000) + " seconds");
+        } else {
+            showToast("Device Admin not active");
+        }
+    }
+
 
 
 
