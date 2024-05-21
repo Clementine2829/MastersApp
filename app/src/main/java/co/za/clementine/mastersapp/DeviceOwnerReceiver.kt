@@ -17,6 +17,7 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
 
 //        manager.setProfileName(componentName, context.getString(R.string.profile_name))
         manager.setProfileName(componentName, context.getString(R.string.profile_name_clementine))
+        manager.setProfileEnabled(componentName);
 
         val intent = Intent(context, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -60,7 +61,9 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
         showToast(context, "Device policies applied");
     }
 
-
+    private fun getComponentName(context: Context): ComponentName {
+        return ComponentName(context, DeviceOwnerReceiver::class.java)
+    }
     private fun disableCamera(dpm: DevicePolicyManager, adminComponent: ComponentName) {
         dpm.setCameraDisabled(adminComponent, true)
     }

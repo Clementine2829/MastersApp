@@ -3,79 +3,67 @@ package co.za.clementine.mastersapp.policies.device;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Bundle;
 import android.os.UserManager;
 import android.widget.Toast;
 
-
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
 
-public class DevicePolicies  {
+public class DevicePolicies extends PoliciesManager {
 
-
-    DevicePolicyManager devicePolicyManager;
-    ComponentName compName;
-    Context context;
     public DevicePolicies(Context context) {
         devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        compName = new ComponentName(context, DeviceOwnerReceiver.class);
+        componentName = new ComponentName(context, DeviceOwnerReceiver.class);
         this.context = context;
+
+        setPasswordSecurityPolicies();
+        enforceStorageEncryption();
+        verifyPolicies();
     }
 
 
-    public void setPasswordPolicy() {
+    public void setPasswordSecurityPolicies() {
+        if (devicePolicyManager.isAdminActive(componentName)) {
+            try {
+                // Only allow PIN and password
+                devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX);
+                devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_COMPLEX);
 
-        assert devicePolicyManager != null;
-        if (devicePolicyManager.isAdminActive(compName)) {
-            // Set password quality to alphanumeric
-            devicePolicyManager.setPasswordQuality(compName, DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC);
+                // Set minimum PIN length to 8 digits
+                devicePolicyManager.setPasswordMinimumLength(componentName, 8);
 
-            // Set minimum password length
-            devicePolicyManager.setPasswordMinimumLength(compName, 8);
+                // Set password expiration timeout to 3 months (90 days)
+//                devicePolicyManager.setPasswordExpirationTimeout(componentName, 90L * 24L * 60L * 60L * 1000L);  // 90 days
 
-            // Set password expiration timeout
-            devicePolicyManager.setPasswordExpirationTimeout(compName, 30L * 24L * 60L * 60L * 1000L);  // 30 days
+                // Example: Set password expiration timeout to 5 minutes for testing
+                devicePolicyManager.setPasswordExpirationTimeout(componentName, 2L * 60L * 1000L);  // 5 minutes
 
-            // Set maximum failed passwords for wipe
-            devicePolicyManager.setMaximumFailedPasswordsForWipe(compName, 10);
+                // Set maximum failed passwords for wipe
+                devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 3);
 
-            showToast("Password policy set");
+                showToast("High security policies set");
+            } catch (SecurityException e) {
+                showToast("Failed to set high security policies: " + e.getMessage());
+            }
+        } else {
+            showToast("Device Admin not active");
+        }
+    }
+    private void enforceStorageEncryption() {
+        if (devicePolicyManager.isAdminActive(componentName)) {
+            if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_UNSUPPORTED) {
+                devicePolicyManager.setStorageEncryption(componentName, true);
+                showToast("Storage encryption enforced");
+            } else {
+                showToast("Storage encryption is not supported on this device");
+            }
         } else {
             showToast("Device Admin not active");
         }
     }
 
-    public void setWorkProfileRestrictions() {
 
-        if (devicePolicyManager.isProfileOwnerApp(context.getPackageName())) {
-//            // Set some restrictions
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_SHARE_LOCATION);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_UNINSTALL_APPS);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_ADD_USER);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_CONFIG_CELL_BROADCASTS);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_CONFIG_BLUETOOTH);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_CONFIG_WIFI);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_CREATE_WINDOWS);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_DEBUGGING_FEATURES);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_FACTORY_RESET);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_INSTALL_APPS);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES);
-            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_MODIFY_ACCOUNTS);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_REMOVE_USER);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_USB_FILE_TRANSFER);
-//            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_SAFE_BOOT);
 
-            showToast("Work profile restrictions set");
-        } else {
-            showToast("Not a profile owner");
-        }
 
-    }
-    public void showToast(String message) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-    }
 
 }
 

@@ -1,14 +1,15 @@
 package co.za.clementine.mastersapp
 
-import android.app.admin.DeviceAdminInfo
+import android.app.AlertDialog
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
-import android.widget.Toast
 import android.content.Intent
-
+import android.os.UserManager
+import android.provider.Settings
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.widget.Toast
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
@@ -20,16 +21,21 @@ class WorkProfileManager(private val context: Context) {
     fun createWorkProfile() {
 
         try {
+            if(!isMultipleUsersEnabled(context)){
+                showEnableMultipleUsersDialog()
+                return
+            }
             // Check if the app is already a device owner
             if (dpm.isDeviceOwnerApp(context.packageName)) {
                 // Get existing secondary users (profiles)
                 val existingProfiles = dpm.getSecondaryUsers(adminComponent)
                 if (existingProfiles.size > 0) {
                     // Another profile already exists, so we cannot create another one
-                    Toast.makeText(context, "Only one additional profile is allowed", Toast.LENGTH_SHORT).show()
+                    makeToast("Only one additional profile is allowed")
                 } else {
-                    val flags = DevicePolicyManager.SKIP_SETUP_WIZARD or
-                                DevicePolicyManager.MAKE_USER_EPHEMERAL
+//                    val flags = DevicePolicyManager.SKIP_SETUP_WIZARD or
+//                                DevicePolicyManager.MAKE_USER_EPHEMERAL or
+//                                DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED
                     // Create a work profile
                     val workProfile = dpm.createAndManageUser(adminComponent, "Work Profile", adminComponent,
                         null,0 /*DevicePolicyManager.MAKE_USER_EPHEMERAL*/)
@@ -37,23 +43,49 @@ class WorkProfileManager(private val context: Context) {
 
                     if (workProfile != null) {
                         // Work profile created successfully, the setup wizard should be triggered automatically
-                        Toast.makeText(context, "Work profile creation initiated", Toast.LENGTH_SHORT).show()
+                        makeToast("Work profile creation initiated")
                     } else {
                         // Failed to create work profile
-                        Toast.makeText(context, "Failed to create work profile", Toast.LENGTH_SHORT).show()
+                        makeToast("Failed to create work profile")
                     }
                 }
             } else {
                 // Handle case where app is not a device owner
-                Toast.makeText(context, "App is not a device owner", Toast.LENGTH_SHORT).show()
+                makeToast("App is not a device owner")
             }
         } catch (e: SecurityException) {
             // Handle security exceptions
-            Toast.makeText(context, "Security exception occurred", Toast.LENGTH_SHORT).show()
+            makeToast("Security exception occurred")
         } catch (e: Exception) {
             // Handle other exceptions
-            Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
+            makeToast("An error occurred")
         }
+    }
+
+
+    private fun isMultipleUsersEnabled(context: Context): Boolean {
+        return try {
+            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled")
+            pref == 1 && UserManager.supportsMultipleUsers()
+        } catch (e: Settings.SettingNotFoundException) {
+            println("user_switcher_enabled setting not found: ${e.message}")
+            false
+        }
+    }
+
+    private fun showEnableMultipleUsersDialog() {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Enable Multiple Users")
+        builder.setMessage("To use this feature, you need to enable the 'Multiple users' setting on your device. Would you like to open the settings now?")
+        builder.setPositiveButton("Open Settings") { _, _ ->
+            val intent = Intent(Settings.ACTION_SETTINGS)
+            context.startActivity(intent)
+        }
+        builder.setNeutralButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 
 
@@ -71,11 +103,13 @@ class WorkProfileManager(private val context: Context) {
             context.startActivity(intent)
         } else {
             // Handle case where the settings activity is not found
-            Toast.makeText(context, "Settings not found", Toast.LENGTH_SHORT).show()
+            makeToast("Settings not found")
         }
     }
 
-
+    private fun makeToast(message: String){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 
 
     public fun lockProfile() {
