@@ -109,5 +109,12 @@
                 android:layout_marginTop="20dp"
                 android:text="@string/remove_device_admin" />
 
+            <Button
+                android:id="@+id/enforceWifiPolicies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/enforce_wifi_policies" />
+
         </LinearLayout>
 </ScrollView>

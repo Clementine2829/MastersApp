@@ -16,5 +16,6 @@
     <string name="install_apps">Install Apps</string>
     <string name="get_installed_apps">Get Installed Apps</string>
     <string name="remove_device_admin">Remove device admin</string>
+    <string name="enforce_wifi_policies">Enforce Wifi Policies</string>
     <string name="switch_to_owner_profile">Switch to owner profile</string>
 </resources>

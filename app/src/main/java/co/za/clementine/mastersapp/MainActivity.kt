@@ -5,6 +5,8 @@ import android.content.ComponentName
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +18,10 @@ import co.za.clementine.mastersapp.permissions.StorageAccessPermission
 import co.za.clementine.mastersapp.policies.device.DevicePolicies
 import co.za.clementine.mastersapp.policies.device.PoliciesManager
 import co.za.clementine.mastersapp.policies.device.ProfilePolicies
+import co.za.clementine.mastersapp.policies.wifi.PermissionManager
+import co.za.clementine.mastersapp.policies.wifi.WifiBroadcastReceiver
+import co.za.clementine.mastersapp.policies.wifi.WifiPolicyEnforcer
+import co.za.clementine.mastersapp.policies.wifi.WifiPolicyManager
 import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSwitcher
@@ -30,14 +36,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var manageWorkProfileInstalledApps: ManageWorkProfileInstalledApps
     private lateinit var storageAccessPermission: StorageAccessPermission
 
+    private lateinit var wifiPolicyManager: WifiPolicyManager
+    private lateinit var permissionManager: PermissionManager
+    private lateinit var wifiPolicyEnforcer: WifiPolicyEnforcer
+    private lateinit var wifiBroadcastReceiver: WifiBroadcastReceiver
+
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        storageAccessPermission = StorageAccessPermission(this)
-        storageAccessPermission.checkAndRequestPermission()
 
         val profileSelectionDialog = ProfileSelectionDialog(this)
 
@@ -55,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         val btnInstallApps = findViewById<Button>(R.id.btnInstallApps)
         val btnGetInstalledAppsInWorkProfile = findViewById<Button>(R.id.btnGetInstalledAppsInWorkProfile)
         val removeDeviceAdmin = findViewById<Button>(R.id.removeDeviceAdmin)
+        val enforceWifiPolicies = findViewById<Button>(R.id.enforceWifiPolicies)
 
 
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -62,6 +72,16 @@ class MainActivity : AppCompatActivity() {
 
         manageWorkProfileInstalledApps = ManageWorkProfileInstalledApps(this)
 
+        wifiPolicyManager = WifiPolicyManager(this)
+        permissionManager = PermissionManager(this)
+        wifiPolicyEnforcer = WifiPolicyEnforcer(this, wifiPolicyManager)
+        wifiBroadcastReceiver = WifiBroadcastReceiver(this)
+
+
+
+
+        val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+        registerReceiver(wifiBroadcastReceiver, intentFilter)
 
         checkDeviceOwner(savedInstanceState)
 
@@ -142,6 +162,14 @@ class MainActivity : AppCompatActivity() {
 //            }
         }
 
+        enforceWifiPolicies.setOnClickListener {
+            permissionManager.requestNecessaryPermissions()
+            wifiPolicyEnforcer.enforceSecureWifiPolicy()
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(wifiBroadcastReceiver)
     }
 
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
@@ -175,7 +203,6 @@ class MainActivity : AppCompatActivity() {
         stopLockTask()
     }
 
-
     private fun getWorkProfileInstalledApps(): List<String> {
         return manageWorkProfileInstalledApps.getInstalledAppsInWorkProfile()
     }
@@ -196,6 +223,16 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Provisioning failed or canceled", Toast.LENGTH_SHORT).show()
             }
         }
+        permissionManager.handleWriteSettingsResult(requestCode) {
+            wifiPolicyEnforcer.enforceSecureWifiPolicy()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionManager.handlePermissionsResult(requestCode, grantResults) {
+            wifiPolicyEnforcer.enforceSecureWifiPolicy()
+        }
     }
 
     private fun enableProfileOwner() {
@@ -212,5 +249,4 @@ class MainActivity : AppCompatActivity() {
         devicePolicyManager.setProfileName(adminComponentName, "Work Profile")
         Toast.makeText(this, "Profile owner enabled", Toast.LENGTH_SHORT).show()
     }
-
 }
