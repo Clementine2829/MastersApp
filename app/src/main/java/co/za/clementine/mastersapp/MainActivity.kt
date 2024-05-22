@@ -5,6 +5,8 @@ import android.content.ComponentName
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +19,7 @@ import co.za.clementine.mastersapp.policies.device.DevicePolicies
 import co.za.clementine.mastersapp.policies.device.PoliciesManager
 import co.za.clementine.mastersapp.policies.device.ProfilePolicies
 import co.za.clementine.mastersapp.policies.wifi.PermissionManager
+import co.za.clementine.mastersapp.policies.wifi.WifiBroadcastReceiver
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyEnforcer
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyManager
 import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
@@ -36,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiPolicyManager: WifiPolicyManager
     private lateinit var permissionManager: PermissionManager
     private lateinit var wifiPolicyEnforcer: WifiPolicyEnforcer
+    private lateinit var wifiBroadcastReceiver: WifiBroadcastReceiver
 
 
 
@@ -71,8 +75,13 @@ class MainActivity : AppCompatActivity() {
         wifiPolicyManager = WifiPolicyManager(this)
         permissionManager = PermissionManager(this)
         wifiPolicyEnforcer = WifiPolicyEnforcer(this, wifiPolicyManager)
+        wifiBroadcastReceiver = WifiBroadcastReceiver(this)
 
-        permissionManager.requestNecessaryPermissions()
+
+
+
+        val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+        registerReceiver(wifiBroadcastReceiver, intentFilter)
 
         checkDeviceOwner(savedInstanceState)
 
@@ -154,8 +163,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         enforceWifiPolicies.setOnClickListener {
+            permissionManager.requestNecessaryPermissions()
             wifiPolicyEnforcer.enforceSecureWifiPolicy()
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(wifiBroadcastReceiver)
     }
 
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
@@ -213,6 +227,14 @@ class MainActivity : AppCompatActivity() {
             wifiPolicyEnforcer.enforceSecureWifiPolicy()
         }
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionManager.handlePermissionsResult(requestCode, grantResults) {
+            wifiPolicyEnforcer.enforceSecureWifiPolicy()
+        }
+    }
+
     private fun enableProfileOwner() {
         if (!devicePolicyManager.isDeviceOwnerApp(packageName)) {
             Toast.makeText(this, "App is not the device owner", Toast.LENGTH_SHORT).show()
