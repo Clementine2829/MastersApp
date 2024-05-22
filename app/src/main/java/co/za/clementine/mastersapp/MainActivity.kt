@@ -16,6 +16,9 @@ import co.za.clementine.mastersapp.permissions.StorageAccessPermission
 import co.za.clementine.mastersapp.policies.device.DevicePolicies
 import co.za.clementine.mastersapp.policies.device.PoliciesManager
 import co.za.clementine.mastersapp.policies.device.ProfilePolicies
+import co.za.clementine.mastersapp.policies.wifi.PermissionManager
+import co.za.clementine.mastersapp.policies.wifi.WifiPolicyEnforcer
+import co.za.clementine.mastersapp.policies.wifi.WifiPolicyManager
 import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSwitcher
@@ -30,14 +33,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var manageWorkProfileInstalledApps: ManageWorkProfileInstalledApps
     private lateinit var storageAccessPermission: StorageAccessPermission
 
+    private lateinit var wifiPolicyManager: WifiPolicyManager
+    private lateinit var permissionManager: PermissionManager
+    private lateinit var wifiPolicyEnforcer: WifiPolicyEnforcer
+
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        storageAccessPermission = StorageAccessPermission(this)
-        storageAccessPermission.checkAndRequestPermission()
 
         val profileSelectionDialog = ProfileSelectionDialog(this)
 
@@ -55,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         val btnInstallApps = findViewById<Button>(R.id.btnInstallApps)
         val btnGetInstalledAppsInWorkProfile = findViewById<Button>(R.id.btnGetInstalledAppsInWorkProfile)
         val removeDeviceAdmin = findViewById<Button>(R.id.removeDeviceAdmin)
+        val enforceWifiPolicies = findViewById<Button>(R.id.enforceWifiPolicies)
 
 
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -62,6 +68,11 @@ class MainActivity : AppCompatActivity() {
 
         manageWorkProfileInstalledApps = ManageWorkProfileInstalledApps(this)
 
+        wifiPolicyManager = WifiPolicyManager(this)
+        permissionManager = PermissionManager(this)
+        wifiPolicyEnforcer = WifiPolicyEnforcer(this, wifiPolicyManager)
+
+        permissionManager.requestNecessaryPermissions()
 
         checkDeviceOwner(savedInstanceState)
 
@@ -142,6 +153,9 @@ class MainActivity : AppCompatActivity() {
 //            }
         }
 
+        enforceWifiPolicies.setOnClickListener {
+            wifiPolicyEnforcer.enforceSecureWifiPolicy()
+        }
     }
 
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
@@ -175,7 +189,6 @@ class MainActivity : AppCompatActivity() {
         stopLockTask()
     }
 
-
     private fun getWorkProfileInstalledApps(): List<String> {
         return manageWorkProfileInstalledApps.getInstalledAppsInWorkProfile()
     }
@@ -196,8 +209,10 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Provisioning failed or canceled", Toast.LENGTH_SHORT).show()
             }
         }
+        permissionManager.handleWriteSettingsResult(requestCode) {
+            wifiPolicyEnforcer.enforceSecureWifiPolicy()
+        }
     }
-
     private fun enableProfileOwner() {
         if (!devicePolicyManager.isDeviceOwnerApp(packageName)) {
             Toast.makeText(this, "App is not the device owner", Toast.LENGTH_SHORT).show()
@@ -212,5 +227,4 @@ class MainActivity : AppCompatActivity() {
         devicePolicyManager.setProfileName(adminComponentName, "Work Profile")
         Toast.makeText(this, "Profile owner enabled", Toast.LENGTH_SHORT).show()
     }
-
 }
