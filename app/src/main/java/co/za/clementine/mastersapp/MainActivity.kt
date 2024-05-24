@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,7 @@ import co.za.clementine.mastersapp.policies.wifi.WifiBroadcastReceiver
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyEnforcer
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyManager
 import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
+import co.za.clementine.mastersapp.profile.apps.install.ApkInstaller
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSwitcher
 
@@ -41,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiPolicyEnforcer: WifiPolicyEnforcer
     private lateinit var wifiBroadcastReceiver: WifiBroadcastReceiver
 
+
+    private lateinit var progressBar: ProgressBar
 
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         wifiBroadcastReceiver = WifiBroadcastReceiver(this)
 
 
+        progressBar = findViewById(R.id.progressBar)
 
 
         val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
@@ -143,6 +148,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnInstallApps.setOnClickListener {
+//            val apkInstaller = ApkInstaller(this)
+////            val apkUrl = "https://m-embed.airdroid.com/personal_link.html?channel="
+//            val apkUrl = "https://dl.airdroid.com/AirDroid_4.3.7.1_airdroidhp.apk"
+//            apkInstaller.downloadAndInstall(apkUrl)
+
+            val apkInstaller = ApkInstaller(this)
+            val apkUrl = "https://dl.airdroid.com/AirDroid_4.3.7.1_airdroidhp.apk"
+            apkInstaller.downloadAndInstall(apkUrl)
+
 
         }
 
@@ -171,7 +185,13 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         unregisterReceiver(wifiBroadcastReceiver)
     }
-
+    fun updateProgressBar(progress: Int, max: Int) {
+        runOnUiThread {
+            progressBar.max = max
+            progressBar.progress = progress
+            progressBar.visibility = if (progress == max) ProgressBar.GONE else ProgressBar.VISIBLE
+        }
+    }
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
         var doMessage = "App's device owner state is unknown"
 
