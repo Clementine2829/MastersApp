@@ -38,7 +38,10 @@ class ApkInstaller(private val context: Context) {
         createNotificationChannel()
     }
 
+    private val downloadProgressManager = DownloadProgressManager()
+    private val dismissDownloadPopUp = false;
     fun downloadAndInstall(apkUrl: String) {
+        downloadProgressManager.showProgressPopup(context)
         CoroutineScope(Dispatchers.IO).launch {
             val apkFile = downloadApk(apkUrl)
             apkFile?.let {
@@ -73,10 +76,12 @@ class ApkInstaller(private val context: Context) {
                 while (input.read(data).also { count = it } != -1) {
                     totalBytes += count
                     output.write(data, 0, count)
-                    Log.d("ApkInstaller", "Downloaded $totalBytes / $fileLength bytes")
+//                    Log.d("ApkInstaller", "Downloaded $totalBytes / $fileLength bytes")
                     showProgressNotification(totalBytes, fileLength)
-                    (context as MainActivity).updateProgressBar(totalBytes.toInt(), fileLength)
+                    downloadProgressManager.updateProgress(totalBytes, fileLength.toLong())
+//                    (context as MainActivity).updateProgressBar(totalBytes.toInt(), fileLength)
                 }
+                showProgressNotification(totalBytes, fileLength)
 
                 output.flush()
                 output.close()
@@ -110,30 +115,60 @@ class ApkInstaller(private val context: Context) {
         notificationManager.createNotificationChannel(channel)
     }
 
+//    private fun showProgressNotification(progress: Long, max: Int) {
+//        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+//            .setSmallIcon(android.R.drawable.stat_sys_download)
+//            .setContentTitle("Downloading APK")
+//            .setContentText("Download in progress")
+//            .setPriority(NotificationCompat.PRIORITY_LOW)
+//            .setProgress(max, progress.toInt(), false)
+//        with(NotificationManagerCompat.from(context)) {
+//            if (ActivityCompat.checkSelfPermission(
+//                    context,
+//                    Manifest.permission.POST_NOTIFICATIONS
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                return
+//            }
+//            notify(NOTIFICATION_ID, builder.build())
+//        }
+//    }
     private fun showProgressNotification(progress: Long, max: Int) {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle("Downloading APK")
-            .setContentText("Download in progress")
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setProgress(max, progress.toInt(), false)
+
+        println(max.toString() + " == " + progress + " ? " + (max.toLong() == progress))
+        if (max.toLong() == progress) {
+            builder.setContentTitle("Download Complete")
+                .setContentText("AirDroid downloaded successfully")
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setProgress(0, 0, false) // Remove progress indicator
+        } else {
+            builder.setContentTitle("Downloading AirDroid")
+                .setContentText("Download in progress")
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setProgress(max, progress.toInt(), false)
+        }
+
         with(NotificationManagerCompat.from(context)) {
             if (ActivityCompat.checkSelfPermission(
                     context,
                     Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+                // TODO: Request the missing permissions
                 return
             }
             notify(NOTIFICATION_ID, builder.build())
         }
     }
+
 }
 
