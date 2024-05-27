@@ -7,6 +7,10 @@ android {
     namespace = "co.za.clementine.mastersapp"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "co.za.clementine.mastersapp"
         minSdk = 29

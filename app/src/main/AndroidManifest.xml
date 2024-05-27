@@ -7,6 +7,8 @@ package="co.za.clementine.mastersapp">
         android:name="android.hardware.telephony"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.CREATE_USERS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN"
     tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.MANAGE_USERS"
@@ -20,12 +22,12 @@ package="co.za.clementine.mastersapp">
     <uses-permission android:name="android.permission.INSTALL_PACKAGES"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -37,10 +39,12 @@ package="co.za.clementine.mastersapp">
         tools:ignore="CoarseFineLocation" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
-
+    <uses-permission android:name="android.permission.GET_ACCOUNTS_PRIVILEGED"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -51,6 +55,7 @@ package="co.za.clementine.mastersapp">
         android:theme="@style/Theme.MastersApp"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:requestLegacyExternalStorage="true"
         tools:targetApi="31">
 
         <activity
@@ -77,8 +82,16 @@ package="co.za.clementine.mastersapp">
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
-<!--        <receiver android:name=".profile.apps.InstallationReceiver" />-->
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

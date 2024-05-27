@@ -9,8 +9,10 @@ import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -23,8 +25,14 @@ import co.za.clementine.mastersapp.policies.wifi.WifiBroadcastReceiver
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyEnforcer
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyManager
 import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
+import co.za.clementine.mastersapp.profile.apps.install.ApkInstaller
+import co.za.clementine.mastersapp.profile.apps.install.PlayStoreInstaller
+import co.za.clementine.mastersapp.profile.apps.install.WorkProfileAppInstaller
+import co.za.clementine.mastersapp.profile.apps.install.WorkProfileAppInstaller1
+import co.za.clementine.mastersapp.profile.apps.install.WorkProfileInstaller
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSwitcher
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,8 +48,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var permissionManager: PermissionManager
     private lateinit var wifiPolicyEnforcer: WifiPolicyEnforcer
     private lateinit var wifiBroadcastReceiver: WifiBroadcastReceiver
-
-
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +67,11 @@ class MainActivity : AppCompatActivity() {
         val btnLockDevice = findViewById<Button>(R.id.btnLockDevice)
         val btnSetDevicePolicy = findViewById<Button>(R.id.btnSetDevicePolicy)
         val btnSetWorkProfileRestrictions = findViewById<Button>(R.id.setWorkProfileRestrictions)
+        val btnDownloadApp = findViewById<Button>(R.id.btnDownloadApp)
         val btnInstallApps = findViewById<Button>(R.id.btnInstallApps)
+        val btnInstallAppsFromPLayStore = findViewById<Button>(R.id.btnInstallAppsFromPLayStore)
         val btnGetInstalledAppsInWorkProfile = findViewById<Button>(R.id.btnGetInstalledAppsInWorkProfile)
+        val copyAppIntoWorkProfile = findViewById<Button>(R.id.copyAppIntoWorkProfile)
         val removeDeviceAdmin = findViewById<Button>(R.id.removeDeviceAdmin)
         val enforceWifiPolicies = findViewById<Button>(R.id.enforceWifiPolicies)
 
@@ -76,8 +85,6 @@ class MainActivity : AppCompatActivity() {
         permissionManager = PermissionManager(this)
         wifiPolicyEnforcer = WifiPolicyEnforcer(this, wifiPolicyManager)
         wifiBroadcastReceiver = WifiBroadcastReceiver(this)
-
-
 
 
         val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
@@ -142,7 +149,39 @@ class MainActivity : AppCompatActivity() {
             ProfilePolicies(this)
         }
 
+        btnDownloadApp.setOnClickListener {
+
+            val apkInstaller = ApkInstaller(this)
+            val apkUrl = "https://dl.airdroid.com/AirDroid_4.3.7.1_airdroidhp.apk"
+            apkInstaller.downloadAndInstall(apkUrl)
+
+        }
+
+
         btnInstallApps.setOnClickListener {
+
+//            val fileName = "downloaded_apk.apk"
+            val fileName = "Whatsapp.apk"
+
+            val apkFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+
+            val workProfileInstaller = WorkProfileInstaller(this)
+            workProfileInstaller.installApkInWorkProfile(apkFile)
+
+        }
+
+        btnInstallAppsFromPLayStore.setOnClickListener {
+            val packageName = "com.whatsapp" // Replace with the package name of the app you want to install
+            val playStoreInstaller = PlayStoreInstaller(this)
+            playStoreInstaller.installAppFromPlayStore(packageName)
+        }
+
+        copyAppIntoWorkProfile.setOnClickListener {
+
+            val packageName = "com.whatsapp" // Replace with the package name of the app you want to install in the work profile
+            val workProfileAppInstaller1 = WorkProfileAppInstaller1(this)
+            val workProfileAppInstaller = WorkProfileAppInstaller(this)
+            workProfileAppInstaller.installAppInWorkProfile(packageName)
 
         }
 

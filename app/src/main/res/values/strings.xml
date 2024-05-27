@@ -13,8 +13,11 @@
     <string name="create_profile_owner">Create Profile Owner</string>
     <string name="set_device_policies">Set Device Policies</string>
     <string name="set_work_profile_restrictions">Set work profile restrictions</string>
-    <string name="install_apps">Install Apps</string>
+    <string name="download_app">Download App</string>
+    <string name="install_apps">Install App</string>
+    <string name="install_apps_playstore">Install App Play Store</string>
     <string name="get_installed_apps">Get Installed Apps</string>
+    <string name="copy_app_into_work_profile">Copy app into work profile</string>
     <string name="remove_device_admin">Remove device admin</string>
     <string name="enforce_wifi_policies">Enforce Wifi Policies</string>
     <string name="switch_to_owner_profile">Switch to owner profile</string>

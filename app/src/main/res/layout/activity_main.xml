@@ -89,6 +89,14 @@
                 android:text="@string/set_work_profile_restrictions" />
 
             <Button
+                android:id="@+id/btnDownloadApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/download_app" />
+
+
+            <Button
                 android:id="@+id/btnInstallApps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -101,6 +109,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/get_installed_apps" />
+
+            <Button
+                android:id="@+id/btnInstallAppsFromPLayStore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/install_apps_playstore" />
+
+           <Button
+                android:id="@+id/copyAppIntoWorkProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/copy_app_into_work_profile" />
 
             <Button
                 android:id="@+id/removeDeviceAdmin"
