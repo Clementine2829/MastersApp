@@ -138,5 +138,19 @@
                 android:layout_marginTop="20dp"
                 android:text="@string/enforce_wifi_policies" />
 
+            <Button
+                android:id="@+id/btnDisableDiscoverabilityButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/disable_bluetooth_discoverability"
+                android:layout_marginTop="20dp" />
+
+            <Button
+                android:id="@+id/btnLimitConnectionsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/limit_bluetooth_connections"
+                android:layout_marginTop="20dp" />
+
         </LinearLayout>
 </ScrollView>
