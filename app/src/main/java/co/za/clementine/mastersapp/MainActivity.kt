@@ -36,6 +36,7 @@ import co.za.clementine.mastersapp.profile.apps.install.WorkProfileInstaller
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSwitcher
 import java.io.File
+import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity() {
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity() {
 
         checkDeviceOwner(savedInstanceState)
 
-        bluetoothController = BluetoothController(this);
+        bluetoothController = BluetoothController(this)
 
         val workProfileManager = WorkProfileManager(this)
 
@@ -139,19 +140,19 @@ class MainActivity : AppCompatActivity() {
 
         btnSwitchToOwnerProfile.setOnClickListener {
 //            if (arePoliciesApplied(devicePolicyManager, adminComponentName)){
-                val profileSwitcher = ProfileSwitcher(this);
-                profileSwitcher.switchToAdminProfile();
+                val profileSwitcher = ProfileSwitcher(this)
+            profileSwitcher.switchToAdminProfile()
 //            } else {
 //                showPolicyDialog(this)
 //            }
         }
 
         btnLockDevice.setOnClickListener {
-            workProfileManager.lockProfile();
+            workProfileManager.lockProfile()
         }
 
         btnSetDevicePolicy.setOnClickListener {
-            DevicePolicies(this);
+            DevicePolicies(this)
         }
 
         btnSetWorkProfileRestrictions.setOnClickListener {
@@ -231,6 +232,11 @@ class MainActivity : AppCompatActivity() {
         unregisterReceiver(wifiBroadcastReceiver)
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finishAffinity()
+        exitProcess(0)
+    }
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
         var doMessage = "App's device owner state is unknown"
 
