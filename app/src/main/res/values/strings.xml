@@ -23,4 +23,34 @@
     <string name="switch_to_owner_profile">Switch to owner profile</string>
     <string name="limit_bluetooth_connections">Limit Bluetooth Connections</string>
     <string name="disable_bluetooth_discoverability">Disable Discoverability</string>
+    <string name="app_icon_description">App Icon</string>
+    <string name="disclaimer_text">By using this app, you agree to the Terms &amp; Conditions and User Privacy policies. The app has device owner capabilities and can make changes to the device.</string>
+    <string name="agree">Agree</string>
+    <string name="cancel">Cancel</string>
+    <string name="more_info">More Info</string>
+    <string name="more_info_content">
+    <![CDATA[
+    <h2>Terms & Conditions</h2>
+    <p>Welcome to Clementine Masters App. By using this app, you agree to the following terms and conditions:</p>
+    <ul>
+        <li><b>Usage:</b> This app is designed to help you create and switch work profiles on your device. You must use the app in compliance with all applicable laws and regulations.</li>
+        <li><b>Device Owner:</b> The app has device owner capabilities and can make changes to the device, such as installing or uninstalling apps, setting device policies, and managing network settings.</li>
+        <li><b>Data Management:</b> The app may require access to certain device data and permissions to function properly. These include, but are not limited to, Wi-Fi settings, Bluetooth settings, and storage access.</li>
+        <li><b>Updates:</b> We may update the app from time to time, and these updates may be automatically installed on your device. You agree to such updates as part of your use of the app.</li>
+        <li><b>Liability:</b> We are not liable for any damage or data loss that may occur as a result of using this app. Use the app at your own risk.</li>
+    </ul>
+
+    <h2>User Privacy</h2>
+    <p>Your privacy is important to us. This section outlines how we handle your personal data:</p>
+    <ul>
+        <li><b>Data Collection:</b> We do not collect any personal data without your explicit consent. The app only accesses the data necessary to perform its functions.</li>
+        <li><b>Data Usage:</b> Any data accessed by the app is used solely for the purpose of creating and managing work profiles and enforcing device policies.</li>
+        <li><b>Data Sharing:</b> We do not share your personal data with third parties. Your data is kept secure and used only within the app.</li>
+        <li><b>Permissions:</b> The app requires various permissions to function correctly. You can review these permissions during the app setup process.</li>
+        <li><b>Security:</b> We implement reasonable security measures to protect your data from unauthorized access or disclosure.</li>
+        <li><b>Contact Us:</b> If you have any questions or concerns about your privacy, please contact us at <a href="mailto:support@clementinemastersapp.co.za">support@clementinemastersapp.co.za</a>.</li>
+    </ul>
+    ]]>
+</string>
+
 </resources>
