@@ -21,4 +21,6 @@
     <string name="remove_device_admin">Remove device admin</string>
     <string name="enforce_wifi_policies">Enforce Wifi Policies</string>
     <string name="switch_to_owner_profile">Switch to owner profile</string>
+    <string name="limit_bluetooth_connections">Limit Bluetooth Connections</string>
+    <string name="disable_bluetooth_discoverability">Disable Discoverability</string>
 </resources>

@@ -6,17 +6,20 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import co.za.clementine.mastersapp.permissions.StorageAccessPermission
+import co.za.clementine.mastersapp.policies.bluetooth.BluetoothController
 import co.za.clementine.mastersapp.policies.device.DevicePolicies
 import co.za.clementine.mastersapp.policies.device.PoliciesManager
 import co.za.clementine.mastersapp.policies.device.ProfilePolicies
@@ -49,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiPolicyEnforcer: WifiPolicyEnforcer
     private lateinit var wifiBroadcastReceiver: WifiBroadcastReceiver
 
+    private var bluetoothController: BluetoothController? = null
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +79,8 @@ class MainActivity : AppCompatActivity() {
         val copyAppIntoWorkProfile = findViewById<Button>(R.id.copyAppIntoWorkProfile)
         val removeDeviceAdmin = findViewById<Button>(R.id.removeDeviceAdmin)
         val enforceWifiPolicies = findViewById<Button>(R.id.enforceWifiPolicies)
+        val btnDisableDiscoverabilityButton = findViewById<Button>(R.id.btnDisableDiscoverabilityButton)
+        val btnLimitConnectionsButton = findViewById<Button>(R.id.btnLimitConnectionsButton)
 
 
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -91,6 +98,8 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(wifiBroadcastReceiver, intentFilter)
 
         checkDeviceOwner(savedInstanceState)
+
+        bluetoothController = BluetoothController(this);
 
         val workProfileManager = WorkProfileManager(this)
 
@@ -205,6 +214,17 @@ class MainActivity : AppCompatActivity() {
             permissionManager.requestNecessaryPermissions()
             wifiPolicyEnforcer.enforceSecureWifiPolicy()
         }
+
+        btnDisableDiscoverabilityButton.setOnClickListener {
+            bluetoothController!!.disableDiscoverability();
+        }
+        btnLimitConnectionsButton.setOnClickListener {
+            bluetoothController!!.limitBluetoothConnections();
+        }
+
+
+        // Check and request necessary permissions at startup
+        bluetoothController!!.checkAndRequestPermissions();
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -272,9 +292,17 @@ class MainActivity : AppCompatActivity() {
         permissionManager.handlePermissionsResult(requestCode, grantResults) {
             wifiPolicyEnforcer.enforceSecureWifiPolicy()
         }
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permissions granted
+                // Initialize BluetoothController or retry operations
+            } else {
+                // Permissions denied
+                // Handle the case when permissions are not granted
+            }
+        }
     }
-
-    private fun enableProfileOwner() {
+     private fun enableProfileOwner() {
         if (!devicePolicyManager.isDeviceOwnerApp(packageName)) {
             Toast.makeText(this, "App is not the device owner", Toast.LENGTH_SHORT).show()
             return
