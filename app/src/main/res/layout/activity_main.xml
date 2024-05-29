@@ -89,11 +89,11 @@
                 android:text="@string/set_work_profile_restrictions" />
 
             <Button
-                android:id="@+id/btnDownloadApp"
+                android:id="@+id/btnDownloadAirDroidApp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/download_app" />
+                android:text="@string/download_air_droid_app" />
 
 
             <Button

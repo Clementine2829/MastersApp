@@ -13,7 +13,7 @@
     <string name="create_profile_owner">Create Profile Owner</string>
     <string name="set_device_policies">Set Device Policies</string>
     <string name="set_work_profile_restrictions">Set work profile restrictions</string>
-    <string name="download_app">Download App</string>
+    <string name="download_air_droid_app">Download AirDroid App</string>
     <string name="install_apps">Install App</string>
     <string name="install_apps_playstore">Install App Play Store</string>
     <string name="get_installed_apps">Get Installed Apps</string>

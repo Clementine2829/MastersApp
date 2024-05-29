@@ -36,14 +36,14 @@ class DisclaimerActivity : AppCompatActivity() {
             // Proceed to main activity or the next step
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-            finishAffinity()
-            exitProcess(0)
+            finish()
         }
 
 
         btnCancel.setOnClickListener {
             // Exit the app or go back
-            finish()
+            finishAffinity()
+            exitProcess(0)
         }
 
         btnMoreInfo.setOnClickListener {
