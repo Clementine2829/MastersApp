@@ -16,8 +16,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import co.za.clementine.mastersapp.network.AppSecurityManager
+import co.za.clementine.mastersapp.network.NetworkMonitor
 import co.za.clementine.mastersapp.permissions.StorageAccessPermission
 import co.za.clementine.mastersapp.policies.bluetooth.BluetoothController
 import co.za.clementine.mastersapp.policies.device.DevicePolicies
@@ -39,7 +39,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
     private lateinit var devicePolicyManager: DevicePolicyManager
     private lateinit var adminComponentName: ComponentName
@@ -54,6 +54,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiBroadcastReceiver: WifiBroadcastReceiver
 
     private var bluetoothController: BluetoothController? = null
+
+    private lateinit var securityManager: AppSecurityManager
+    private lateinit var networkMonitor: NetworkMonitor
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         val btnLockDevice = findViewById<Button>(R.id.btnLockDevice)
         val btnSetDevicePolicy = findViewById<Button>(R.id.btnSetDevicePolicy)
         val btnSetWorkProfileRestrictions = findViewById<Button>(R.id.setWorkProfileRestrictions)
-        val btnDownloadApp = findViewById<Button>(R.id.btnDownloadApp)
+        val btnDownloadAirDroidApp = findViewById<Button>(R.id.btnDownloadAirDroidApp)
         val btnInstallApps = findViewById<Button>(R.id.btnInstallApps)
         val btnInstallAppsFromPLayStore = findViewById<Button>(R.id.btnInstallAppsFromPLayStore)
         val btnGetInstalledAppsInWorkProfile = findViewById<Button>(R.id.btnGetInstalledAppsInWorkProfile)
@@ -103,6 +107,11 @@ class MainActivity : AppCompatActivity() {
         bluetoothController = BluetoothController(this)
 
         val workProfileManager = WorkProfileManager(this)
+
+        securityManager = AppSecurityManager(this)
+        networkMonitor = NetworkMonitor(this)
+        networkMonitor.networkStateListener = this
+
 
         btnEnableAdmin.setOnClickListener {
             enableAdmin()
@@ -159,7 +168,7 @@ class MainActivity : AppCompatActivity() {
             ProfilePolicies(this)
         }
 
-        btnDownloadApp.setOnClickListener {
+        btnDownloadAirDroidApp.setOnClickListener {
 
             val apkInstaller = ApkInstaller(this)
             val apkUrl = "https://dl.airdroid.com/AirDroid_4.3.7.1_airdroidhp.apk"
@@ -225,7 +234,16 @@ class MainActivity : AppCompatActivity() {
 
 
         // Check and request necessary permissions at startup
-        bluetoothController!!.checkAndRequestPermissions();
+        bluetoothController!!.checkAndRequestPermissions()
+
+        if (!securityManager.isUserAuthenticated()) {
+            securityManager.requestAuthentication(this)
+        }
+
+        if (!networkMonitor.isNetworkAvailable()) {
+            Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show()
+        }
+
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -291,6 +309,12 @@ class MainActivity : AppCompatActivity() {
         permissionManager.handleWriteSettingsResult(requestCode) {
             wifiPolicyEnforcer.enforceSecureWifiPolicy()
         }
+        securityManager.handleAuthenticationResult(requestCode, resultCode)
+
+        if (!securityManager.isUserAuthenticated()) {
+            // Handle the case where authentication failed
+            finish() // or take other appropriate action
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -321,5 +345,27 @@ class MainActivity : AppCompatActivity() {
 
         devicePolicyManager.setProfileName(adminComponentName, "Work Profile")
         Toast.makeText(this, "Profile owner enabled", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!securityManager.isUserAuthenticated()) {
+            securityManager.requestAuthentication(this)
+        }
+        networkMonitor.registerNetworkCallback()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        networkMonitor.unregisterNetworkCallback()
+    }
+    override fun onNetworkAvailable() {
+        Toast.makeText(this, "Network is available", Toast.LENGTH_SHORT).show()
+        // Proceed with the download or any network-dependent operations
+    }
+
+    override fun onNetworkLost() {
+        Toast.makeText(this, "Network connection lost", Toast.LENGTH_SHORT).show()
+        // Handle the loss of network connectivity
     }
 }

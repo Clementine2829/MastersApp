@@ -1,6 +1,7 @@
 package co.za.clementine.mastersapp.policies.wifi
 
 import android.content.Context
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 
 class WifiPolicyEnforcer(private val context: Context, private val wifiPolicyManager: WifiPolicyManager) {
@@ -16,6 +17,8 @@ class WifiPolicyEnforcer(private val context: Context, private val wifiPolicyMan
                 .show()
 
 //            wifiPolicyManager.suggestSecureNetwork("", "")
+        } else{
+            Toast.makeText(context, "Wi-Fi is secured ", Toast.LENGTH_SHORT).show()
         }
     }
 }
