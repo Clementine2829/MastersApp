@@ -50,7 +50,7 @@ public class DevicePolicies extends PoliciesManager {
             showToast("Device Admin not active");
         }
     }
-    private void enforceStorageEncryption() {
+    public void enforceStorageEncryption() {
         if (devicePolicyManager.isAdminActive(componentName)) {
             if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_UNSUPPORTED) {
                 devicePolicyManager.setStorageEncryption(componentName, true);
@@ -71,11 +71,6 @@ public class DevicePolicies extends PoliciesManager {
             showToast("Device Admin not active");
         }
     }
-
-
-
-
-
 
 }
 

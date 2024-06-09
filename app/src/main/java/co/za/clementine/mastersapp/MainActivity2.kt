@@ -79,9 +79,15 @@ class MainActivity2 : AppCompatActivity() {
         tasks[position].retryVisible = false
         adapter.notifyItemChanged(position)
 
+        // Auto scroll to the current task position
         recyclerView.smoothScrollToPosition(position)
 
-        val success = tasks[position].action()
+        val success = try {
+            tasks[position].action()
+            true
+        } catch (e: Exception) {
+            false
+        }
 
         if (success) {
             tasks[position].status = "Completed"
@@ -98,9 +104,15 @@ class MainActivity2 : AppCompatActivity() {
         tasks[position].undoVisible = false
         adapter.notifyItemChanged(position)
 
+        // Auto scroll to the current task position
         recyclerView.smoothScrollToPosition(position)
 
-        val success = tasks[position].undoAction()
+        val success = try {
+            tasks[position].undoAction()
+            true
+        } catch (e: Exception) {
+            false
+        }
 
         if (success) {
             tasks[position].status = "Undone"

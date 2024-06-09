@@ -9,26 +9,34 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Task Name" />
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:text="@string/task_name" />
 
     <TextView
         android:id="@+id/taskStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pending"
-        android:textColor="@android:color/holo_red_dark" />
+        android:text="@string/pending"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:textColor="@color/red" />
 
-    <Button
+    <TextView
         android:id="@+id/btnRetry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Retry"
-        android:visibility="gone" />
+        android:textColor="@color/green"
+        android:visibility="gone"
+        android:text="@string/retry" />
 
-    <Button
+    <TextView
         android:id="@+id/btnUndo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Undo"
-        android:visibility="gone" />
+        android:textColor="@color/red"
+        android:visibility="gone"
+        android:text="@string/undo" />
 </LinearLayout>

@@ -1,10 +1,9 @@
 package co.za.clementine.mastersapp.enrollment.process
 
-// TaskAdapter.kt
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import co.za.clementine.mastersapp.R
@@ -25,8 +24,8 @@ class TaskAdapter(
         holder.taskName.text = task.name
         holder.taskStatus.text = task.status
         holder.taskStatus.setTextColor(
-            if (task.status == "Completed") holder.itemView.context.getColor(android.R.color.holo_green_dark)
-            else holder.itemView.context.getColor(android.R.color.holo_red_dark)
+            if (task.status == "Completed") holder.itemView.context.getColor(R.color.green)
+            else holder.itemView.context.getColor(R.color.red)
         )
         holder.btnRetry.visibility = if (task.retryVisible) View.VISIBLE else View.GONE
         holder.btnUndo.visibility = if (task.undoVisible) View.VISIBLE else View.GONE
@@ -39,7 +38,7 @@ class TaskAdapter(
     class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val taskName: TextView = view.findViewById(R.id.taskName)
         val taskStatus: TextView = view.findViewById(R.id.taskStatus)
-        val btnRetry: Button = view.findViewById(R.id.btnRetry)
-        val btnUndo: Button = view.findViewById(R.id.btnUndo)
+        val btnRetry: TextView = view.findViewById(R.id.btnRetry)
+        val btnUndo: TextView = view.findViewById(R.id.btnUndo)
     }
 }
