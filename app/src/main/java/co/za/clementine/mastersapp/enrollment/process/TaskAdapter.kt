@@ -1,0 +1,45 @@
+package co.za.clementine.mastersapp.enrollment.process
+
+// TaskAdapter.kt
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import co.za.clementine.mastersapp.R
+
+class TaskAdapter(
+    private val tasks: List<Task>,
+    private val retryCallback: (Int) -> Unit,
+    private val undoCallback: (Int) -> Unit
+) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
+        return TaskViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+        val task = tasks[position]
+        holder.taskName.text = task.name
+        holder.taskStatus.text = task.status
+        holder.taskStatus.setTextColor(
+            if (task.status == "Completed") holder.itemView.context.getColor(android.R.color.holo_green_dark)
+            else holder.itemView.context.getColor(android.R.color.holo_red_dark)
+        )
+        holder.btnRetry.visibility = if (task.retryVisible) View.VISIBLE else View.GONE
+        holder.btnUndo.visibility = if (task.undoVisible) View.VISIBLE else View.GONE
+        holder.btnRetry.setOnClickListener { retryCallback(position) }
+        holder.btnUndo.setOnClickListener { undoCallback(position) }
+    }
+
+    override fun getItemCount(): Int = tasks.size
+
+    class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val taskName: TextView = view.findViewById(R.id.taskName)
+        val taskStatus: TextView = view.findViewById(R.id.taskStatus)
+        val btnRetry: Button = view.findViewById(R.id.btnRetry)
+        val btnUndo: Button = view.findViewById(R.id.btnUndo)
+    }
+}
