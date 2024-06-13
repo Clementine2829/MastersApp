@@ -56,5 +56,8 @@
     <string name="undo">Undo</string>
     <string name="pending">Pending</string>
     <string name="task_name">Task Name</string>
+    <string name="masters_app">Masters App</string>
+    <string name="home_page">Home page</string>
+    <string name="app_version_1_0_0">App Version: 1.0.0</string>
 
 </resources>

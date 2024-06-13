@@ -18,8 +18,27 @@ class WorkProfileManager(private val context: Context) {
     private val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
     private val adminComponent = ComponentName(context, DeviceOwnerReceiver::class.java)
 
-    fun createWorkProfile() {
+    fun workProfileExist(): Boolean {
+        try {
+            if (!isMultipleUsersEnabled(context)) {
+                showEnableMultipleUsersDialog()
+                return false
+            }
+            if (dpm.isDeviceOwnerApp(context.packageName)) {
+                val existingProfiles = dpm.getSecondaryUsers(adminComponent)
+                return (existingProfiles.size > 0)
+            }
+        } catch (e: SecurityException) {
+                // Handle security exceptions
+                makeToast("Security exception occurred")
+        } catch (e: Exception) {
+            // Handle other exceptions
+            makeToast("An error occurred")
+        }
+        return false
+    }
 
+    fun createWorkProfile() {
         try {
             if(!isMultipleUsersEnabled(context)){
                 showEnableMultipleUsersDialog()
@@ -29,10 +48,7 @@ class WorkProfileManager(private val context: Context) {
             if (dpm.isDeviceOwnerApp(context.packageName)) {
                 // Get existing secondary users (profiles)
                 val existingProfiles = dpm.getSecondaryUsers(adminComponent)
-                if (existingProfiles.size > 0) {
-                    // Another profile already exists, so we cannot create another one
-                    makeToast("Only one additional profile is allowed")
-                } else {
+                if (!workProfileExist()) {
 //                    val flags = DevicePolicyManager.SKIP_SETUP_WIZARD or
 //                                DevicePolicyManager.MAKE_USER_EPHEMERAL or
 //                                DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED

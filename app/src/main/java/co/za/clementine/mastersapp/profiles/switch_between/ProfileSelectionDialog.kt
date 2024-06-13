@@ -53,7 +53,6 @@ class ProfileSelectionDialog(private val context: Context) {
         alertDialog.show()
     }
 
-    // Inside your switchToProfile method
     private fun switchToProfile() {
         if (dpm.isDeviceOwnerApp(context.packageName)) {
             val userHandles = dpm.getSecondaryUsers(adminComponentName)
@@ -64,7 +63,7 @@ class ProfileSelectionDialog(private val context: Context) {
                 Toast.makeText(context, "User empty", Toast.LENGTH_SHORT).show()
             }
         } else{
-            System.out.println("App is not device manager")
+            println("App is not device manager")
         }
     }
 //    fun switchToAdminProfile() {

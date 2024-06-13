@@ -11,7 +11,12 @@ import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -25,13 +30,15 @@ import co.za.clementine.mastersapp.network.NetworkMonitor
 import co.za.clementine.mastersapp.permissions.StorageAccessPermission
 import co.za.clementine.mastersapp.policies.bluetooth.BluetoothController
 import co.za.clementine.mastersapp.policies.device.DevicePolicies
+import co.za.clementine.mastersapp.policies.device.ProfilePolicies
 import co.za.clementine.mastersapp.policies.wifi.PermissionManager
 import co.za.clementine.mastersapp.policies.wifi.WifiBroadcastReceiver
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyEnforcer
 import co.za.clementine.mastersapp.policies.wifi.WifiPolicyManager
 import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
+import co.za.clementine.mastersapp.profile.apps.install.ApkInstaller
+import co.za.clementine.mastersapp.profile.apps.install.WorkProfileInstaller
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
-import co.za.clementine.mastersapp.profiles.switch_between.ProfileSwitcher
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.system.exitProcess
@@ -57,10 +64,12 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
     private lateinit var networkMonitor: NetworkMonitor
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adminProfileAdapter: TaskAdapter
-    private lateinit var workProfileAdapter: TaskAdapter
-    private val adminProfileTasks = mutableListOf<Task>()
-    private val workProfileTasks = mutableListOf<Task>()
+
+    private lateinit var adapter: TaskAdapter
+//    private lateinit var workProfileAdapter: TaskAdapter
+
+    private val tasks = mutableListOf<Task>()
+//    private val workProfileTasks = mutableListOf<Task>()
 
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -119,11 +128,14 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adminProfileAdapter = TaskAdapter(adminProfileTasks, { position -> retryTask(position) }, { position -> undoTask(position) })
-        recyclerView.adapter = adminProfileAdapter
+        adapter = TaskAdapter(tasks, { position -> retryTask(position) }, { position -> undoTask(position) })
+        recyclerView.adapter = adapter
 
-        setupAdminTasks(this)
+        setupAdminTasks()
         startAdminTasks()
+
+//        setupWorProfileTasks()
+//        startWorkProfileTasks()
 
 //
 //        btnEnableAdmin.setOnClickListener {
@@ -258,9 +270,48 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         }
 
     }
+    // Inflate the menu
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
 
-    private fun setupAdminTasks(context: Context) {
-        adminProfileTasks.addAll(
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.about -> {
+                true
+            }
+            R.id.terms_and_conditions -> {
+                gotToTermsAndConditions()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun gotToTermsAndConditions(){
+        startActivity(Intent(this, MoreInfoActivity::class.java))
+    }
+    private fun confirmAppExit(){
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Exit App")
+        builder.setMessage("Are you sure you want to exit? Canceling will close the app.")
+
+        builder.setPositiveButton("YES") { _, _ ->
+            finishAffinity()
+            exitProcess(0)
+        }
+        builder.setNeutralButton("NO") { dialog, _ ->
+            dialog.dismiss()
+            enableAdmin()
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.setCancelable(false)
+        dialog.show()
+    }
+
+    private fun setupAdminTasks() {
+        tasks.addAll(
             listOf(
                 Task(
                     name = "Enable Admin",
@@ -274,12 +325,20 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 //                    undoAction = ::lockTaskModeExit),
 //                Task("Lock Device", "Pending", action = ::lockDevice, undoAction = ::unlockDevice),
 //                Task(name = "Set Device Policy", status = "Pending", action = ::DevicePolicies(), undoAction = ::removeDevicePolicy),
-//                Task(name = "Create work profile",
-//                    status = "Pending",
-//                    action = ::setProfileOwner, undoAction = ::removeProfileOwner),
-//                Task(name = "Switch to work profile",
-//                    status = "Pending",
-//                    action = ::navigateToWorkProfile, undoAction = ::undoNavigateToWorkProfile),
+                Task(name = "Create work profile",
+                    status = if (WorkProfileManager(this).workProfileExist()) "Completed" else "Pending",
+                    action = {
+                        val workProfileManager = WorkProfileManager(this)
+                        workProfileManager.createWorkProfile()
+                    },
+                    undoAction = ::foo),
+                Task(name = "Switch to work profile",
+                    status = if (WorkProfileManager(this).workProfileExist()) "Completed" else "Pending",
+                    action = {
+                        val profileSelectionDialog = ProfileSelectionDialog(this)
+                        profileSelectionDialog.showAndSwitchToWorkProfile()
+                    },
+                    undoAction = ::foo),
 //                Task(name = "Enforce Wi-Fi Policies",
 //                    status = "Pending",
 //                    action = ::enforceWiFiPolicies,
@@ -292,7 +351,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                     name = "Enforce Password policies",
                     status = "Pending",
                     action = {
-                        val devicePolicies = DevicePolicies(context)
+                        val devicePolicies = DevicePolicies(this)
                         devicePolicies.setPasswordSecurityPolicies()
                     },
                     undoAction = ::foo),
@@ -300,7 +359,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                     name = "Enforce Storage Encryption policies",
                     status = "Pending",
                     action = {
-                    val devicePolicies = DevicePolicies(context)
+                    val devicePolicies = DevicePolicies(this)
                     devicePolicies.enforceStorageEncryption()
                 },
                     undoAction = ::foo),
@@ -308,7 +367,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                     name = "Enforce Screen Timeout policies",
                     status = "Pending",
                     action = {
-                        val devicePolicies = DevicePolicies(context)
+                        val devicePolicies = DevicePolicies(this)
                         devicePolicies.setScreenTimeoutPolicy(10000) // 10 seconds
 //                        devicePolicies.setScreenTimeoutPolicy(3000) // 3 seconds
                     },
@@ -325,7 +384,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
     private fun foo(){}
     private fun setupWorProfileTasks() {
-        adminProfileTasks.addAll(
+        tasks.addAll(
             listOf(
 //                Task("Enable Admin", "Pending", action = ::enableAdmin, undoAction = ::undoEnableAdmin),
 //                Task("Lock Task Mode Enter", "Pending", action = ::lockTaskModeEnter, undoAction = ::unlockTaskModeEnter),
@@ -336,9 +395,29 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 //                Task("Switch to Owner Profile", "Pending", action = ::switchToOwnerProfile, undoAction = ::undoSwitchToOwnerProfile),
 //                Task("Lock Device", "Pending", action = ::lockDevice, undoAction = ::unlockDevice),
 //                Task("Set Device Policy", "Pending", action = ::setDevicePolicy, undoAction = ::removeDevicePolicy),
-//                Task("Set Work Profile Restrictions", "Pending", action = ::setWorkProfileRestrictions, undoAction = ::removeWorkProfileRestrictions),
-//                Task("Download AirDroid App", "Pending", action = ::downloadAirDroidApp, undoAction = ::removeAirDroidApp),
-//                Task("Install Apps", "Pending", action = ::installApps, undoAction = ::uninstallApps),
+                Task(name = "Download AirDroid App",
+                    status = "Pending",
+                    action = {
+                        val apkInstaller = ApkInstaller(this)
+                        val apkUrl = "https://dl.airdroid.com/AirDroid_4.3.7.1_airdroidhp.apk"
+                        apkInstaller.downloadAndInstall(apkUrl)
+                    },
+                    undoAction = ::foo),
+                Task(name = "Install AirDroid App",
+                    status = "Pending",
+                    action = {
+//                        val fileName = "downloaded_apk.apk"
+                        val fileName = "Whatsapp.apk"
+                        val apkFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+                        val workProfileInstaller = WorkProfileInstaller(this)
+                        workProfileInstaller.installApkInWorkProfile(apkFile)
+                    },
+                    undoAction = ::foo),
+                Task(name = "Enforce Work Profile Restrictions",
+                    status = "Pending",
+                    action = {
+                        ProfilePolicies(this)
+                    }, undoAction = ::foo),
 //                Task("Get Installed Apps in Work Profile", "Pending", action = ::getInstalledAppsInWorkProfile, undoAction = ::undoGetInstalledAppsInWorkProfile),
 //                Task("Install Apps from Play Store", "Pending", action = ::installAppsFromPlayStore, undoAction = ::uninstallAppsFromPlayStore),
 //                Task("Copy App into Work Profile", "Pending", action = ::copyAppIntoWorkProfile, undoAction = ::removeAppFromWorkProfile),
@@ -353,7 +432,14 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
     private fun startAdminTasks() {
         lifecycleScope.launch {
-            for (i in adminProfileTasks.indices) {
+            for (i in tasks.indices) {
+                executeTask(i)
+            }
+        }
+    }
+    private fun startWorkProfileTasks() {
+        lifecycleScope.launch {
+            for (i in tasks.indices) {
                 executeTask(i)
             }
         }
@@ -384,52 +470,52 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
     }
 
     private suspend fun executeTask(position: Int) {
-        adminProfileTasks[position].status = "In Progress"
-        adminProfileTasks[position].retryVisible = false
-        adminProfileAdapter.notifyItemChanged(position)
+        tasks[position].status = "In Progress"
+        tasks[position].retryVisible = false
+        adapter.notifyItemChanged(position)
 
         // Auto scroll to the current task position
         recyclerView.smoothScrollToPosition(position)
 
         val success = try {
-            adminProfileTasks[position].action()
+            tasks[position].action()
             true
         } catch (e: Exception) {
             false
         }
 
         if (success) {
-            adminProfileTasks[position].status = "Completed"
-            adminProfileTasks[position].undoVisible = true
+            tasks[position].status = "Completed"
+            tasks[position].undoVisible = true
         } else {
-            adminProfileTasks[position].status = "Failed"
-            adminProfileTasks[position].retryVisible = true
+            tasks[position].status = "Failed"
+            tasks[position].retryVisible = true
         }
-        adminProfileAdapter.notifyItemChanged(position)
+        adapter.notifyItemChanged(position)
     }
 
     private suspend fun executeUndoTask(position: Int) {
-        adminProfileTasks[position].status = "Undoing"
-        adminProfileTasks[position].undoVisible = false
-        adminProfileAdapter.notifyItemChanged(position)
+        tasks[position].status = "Undoing"
+        tasks[position].undoVisible = false
+        adapter.notifyItemChanged(position)
 
         // Auto scroll to the current task position
         recyclerView.smoothScrollToPosition(position)
 
         val success = try {
-            adminProfileTasks[position].undoAction()
+            tasks[position].undoAction()
             true
         } catch (e: Exception) {
             false
         }
 
         if (success) {
-            adminProfileTasks[position].status = "Undone"
+            tasks[position].status = "Undone"
         } else {
-            adminProfileTasks[position].status = "Undo Failed"
-            adminProfileTasks[position].undoVisible = true
+            tasks[position].status = "Undo Failed"
+            tasks[position].undoVisible = true
         }
-        adminProfileAdapter.notifyItemChanged(position)
+        adapter.notifyItemChanged(position)
     }
 
 
@@ -459,8 +545,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                 startActivity(intent)
             }
             builder.setNeutralButton("Cancel") { _, _ ->
-                finishAffinity()
-                exitProcess(0)
+                confirmAppExit()
             }
             val dialog: AlertDialog = builder.create()
             dialog.show()
