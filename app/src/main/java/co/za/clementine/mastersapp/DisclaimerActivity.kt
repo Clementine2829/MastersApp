@@ -16,6 +16,7 @@ class DisclaimerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_disclaimer)
+        supportActionBar?.hide()
 
         val appIcon = findViewById<ImageView>(R.id.appIcon)
         val disclaimerText = findViewById<TextView>(R.id.disclaimerText)
@@ -29,12 +30,10 @@ class DisclaimerActivity : AppCompatActivity() {
             securityManager!!.requestAuthentication(this);
         }
 
-
         appIcon.setImageResource(R.drawable.ic_launcher_background)  // Replace with your app icon resource
         disclaimerText.text = getString(R.string.disclaimer_text)
 
         btnAgree.setOnClickListener {
-            // Proceed to main activity or the next step
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
