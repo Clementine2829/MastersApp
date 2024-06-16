@@ -15,8 +15,6 @@ import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -39,6 +37,7 @@ import co.za.clementine.mastersapp.profile.apps.ManageWorkProfileInstalledApps
 import co.za.clementine.mastersapp.profile.apps.install.ApkInstaller
 import co.za.clementine.mastersapp.profile.apps.install.WorkProfileInstaller
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.system.exitProcess
@@ -71,40 +70,15 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
     private val tasks = mutableListOf<Task>()
 //    private val workProfileTasks = mutableListOf<Task>()
 
-
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_2)
 
-        val profileSelectionDialog = ProfileSelectionDialog(this)
-
-//        val btnEnableAdmin = findViewById<Button>(R.id.btnEnableAdmin)
-//        val btnDisableAdmin = findViewById<Button>(R.id.btnDisableAdmin)
-//        val btnLockTaskModeEnter = findViewById<Button>(R.id.btnLockTaskModeEnter)
-//        val btnLockTaskModeExit = findViewById<Button>(R.id.btnLockTaskModeExit)
-//        val btnSetProfileOwner = findViewById<Button>(R.id.btnSetProfileOwner)
-//        val btnNavigateToWorkProfile = findViewById<Button>(R.id.btnNavigateToWorkProfile)
-//        val btnGetProfile = findViewById<Button>(R.id.btnGetProfile)
-//        val btnSwitchToOwnerProfile = findViewById<Button>(R.id.btnSwitchToOwnerProfile)
-//        val btnLockDevice = findViewById<Button>(R.id.btnLockDevice)
-//        val btnSetDevicePolicy = findViewById<Button>(R.id.btnSetDevicePolicy)
-//        val btnSetWorkProfileRestrictions = findViewById<Button>(R.id.setWorkProfileRestrictions)
-//        val btnDownloadAirDroidApp = findViewById<Button>(R.id.btnDownloadAirDroidApp)
-//        val btnInstallApps = findViewById<Button>(R.id.btnInstallApps)
-//        val btnInstallAppsFromPLayStore = findViewById<Button>(R.id.btnInstallAppsFromPLayStore)
-//        val btnGetInstalledAppsInWorkProfile = findViewById<Button>(R.id.btnGetInstalledAppsInWorkProfile)
-//        val copyAppIntoWorkProfile = findViewById<Button>(R.id.copyAppIntoWorkProfile)
-//        val removeDeviceAdmin = findViewById<Button>(R.id.removeDeviceAdmin)
-//        val enforceWifiPolicies = findViewById<Button>(R.id.enforceWifiPolicies)
-//        val btnDisableDiscoverabilityButton = findViewById<Button>(R.id.btnDisableDiscoverabilityButton)
-//        val btnLimitConnectionsButton = findViewById<Button>(R.id.btnLimitConnectionsButton)
-
-
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         adminComponentName = ComponentName(this, DeviceOwnerReceiver::class.java)
 
-        manageWorkProfileInstalledApps = ManageWorkProfileInstalledApps(this)
+        manageWorkProfileInstalledApps = ManageWorkProfileInstalledApps(this, devicePolicyManager, adminComponentName)
 
         wifiPolicyManager = WifiPolicyManager(this)
         permissionManager = PermissionManager(this)
@@ -119,7 +93,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
         bluetoothController = BluetoothController(this)
 
-        val workProfileManager = WorkProfileManager(this)
+//        val workProfileManager = WorkProfileManager(this, devicePolicyManager, adminComponentName)
 
         securityManager = AppSecurityManager(this)
         networkMonitor = NetworkMonitor(this)
@@ -131,13 +105,20 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         adapter = TaskAdapter(tasks, { position -> retryTask(position) }, { position -> undoTask(position) })
         recyclerView.adapter = adapter
 
-        setupAdminTasks()
-        startAdminTasks()
+        if (devicePolicyManager.isDeviceOwnerApp(packageName)) {
+            setupAdminTasks()
+            startAdminTasks()
+        } else if (devicePolicyManager.isProfileOwnerApp(packageName)) {
+//            setupWorkProfileTasks()
+//            startWorkProfileTasks()
+        } else {
+            setupWorkProfileTasks()
+            startWorkProfileTasks()
+//            Toast.makeText(this, "Not a device owner", Toast.LENGTH_SHORT).show()
+        }
 
-//        setupWorProfileTasks()
-//        startWorkProfileTasks()
 
-//
+
 //        btnEnableAdmin.setOnClickListener {
 //            enableAdmin()
 //        }
@@ -303,7 +284,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         }
         builder.setNeutralButton("NO") { dialog, _ ->
             dialog.dismiss()
-            enableAdmin()
+            enableAdmin2()
         }
         val dialog: AlertDialog = builder.create()
         dialog.setCancelable(false)
@@ -326,16 +307,16 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 //                Task("Lock Device", "Pending", action = ::lockDevice, undoAction = ::unlockDevice),
 //                Task(name = "Set Device Policy", status = "Pending", action = ::DevicePolicies(), undoAction = ::removeDevicePolicy),
                 Task(name = "Create work profile",
-                    status = if (WorkProfileManager(this).workProfileExist()) "Completed" else "Pending",
+                    status = if (WorkProfileManager(this, devicePolicyManager, adminComponentName).workProfileExist()) "Completed" else "Pending",
                     action = {
-                        val workProfileManager = WorkProfileManager(this)
+                        val workProfileManager = WorkProfileManager(this, devicePolicyManager, adminComponentName)
                         workProfileManager.createWorkProfile()
                     },
                     undoAction = ::foo),
                 Task(name = "Switch to work profile",
-                    status = if (WorkProfileManager(this).workProfileExist()) "Completed" else "Pending",
+                    status = if (WorkProfileManager(this, devicePolicyManager, adminComponentName).workProfileExist()) "Completed" else "Pending",
                     action = {
-                        val profileSelectionDialog = ProfileSelectionDialog(this)
+                        val profileSelectionDialog = ProfileSelectionDialog(this, devicePolicyManager, adminComponentName)
                         profileSelectionDialog.showAndSwitchToWorkProfile()
                     },
                     undoAction = ::foo),
@@ -368,7 +349,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                     status = "Pending",
                     action = {
                         val devicePolicies = DevicePolicies(this)
-                        devicePolicies.setScreenTimeoutPolicy(10000) // 10 seconds
+                        devicePolicies.setScreenTimeoutPolicy(100000) // 100 seconds
 //                        devicePolicies.setScreenTimeoutPolicy(3000) // 3 seconds
                     },
                     undoAction = ::foo),
@@ -383,7 +364,9 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
     }
 
     private fun foo(){}
-    private fun setupWorProfileTasks() {
+    private fun setupWorkProfileTasks() {
+        val fileName = "AirDroid_4.3.7.1_airdroidhp.apk"
+        val apkInstaller = ApkInstaller(this)
         tasks.addAll(
             listOf(
 //                Task("Enable Admin", "Pending", action = ::enableAdmin, undoAction = ::undoEnableAdmin),
@@ -396,27 +379,26 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 //                Task("Lock Device", "Pending", action = ::lockDevice, undoAction = ::unlockDevice),
 //                Task("Set Device Policy", "Pending", action = ::setDevicePolicy, undoAction = ::removeDevicePolicy),
                 Task(name = "Download AirDroid App",
-                    status = "Pending",
+                    status = if (apkInstaller.fileExistsInDownloadDirectory(fileName))  "Completed" else "Pending",
                     action = {
-                        val apkInstaller = ApkInstaller(this)
-                        val apkUrl = "https://dl.airdroid.com/AirDroid_4.3.7.1_airdroidhp.apk"
-                        apkInstaller.downloadAndInstall(apkUrl)
+                        val apkUrl = "https://dl.airdroid.com/$fileName"
+                        apkInstaller.downloadAndInstall(apkUrl, packageManager)
                     },
                     undoAction = ::foo),
                 Task(name = "Install AirDroid App",
                     status = "Pending",
                     action = {
 //                        val fileName = "downloaded_apk.apk"
-                        val fileName = "Whatsapp.apk"
-                        val apkFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
-                        val workProfileInstaller = WorkProfileInstaller(this)
+                        val fileName2 = "Whatsapp.apk"
+                        val apkFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName2)
+                        val workProfileInstaller = WorkProfileInstaller(this, devicePolicyManager)
                         workProfileInstaller.installApkInWorkProfile(apkFile)
                     },
                     undoAction = ::foo),
                 Task(name = "Enforce Work Profile Restrictions",
                     status = "Pending",
                     action = {
-                        ProfilePolicies(this)
+                        ProfilePolicies().setWorkProfileRestrictions(this, devicePolicyManager, componentName)
                     }, undoAction = ::foo),
 //                Task("Get Installed Apps in Work Profile", "Pending", action = ::getInstalledAppsInWorkProfile, undoAction = ::undoGetInstalledAppsInWorkProfile),
 //                Task("Install Apps from Play Store", "Pending", action = ::installAppsFromPlayStore, undoAction = ::uninstallAppsFromPlayStore),
@@ -473,8 +455,6 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         tasks[position].status = "In Progress"
         tasks[position].retryVisible = false
         adapter.notifyItemChanged(position)
-
-        // Auto scroll to the current task position
         recyclerView.smoothScrollToPosition(position)
 
         val success = try {
@@ -498,8 +478,6 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         tasks[position].status = "Undoing"
         tasks[position].undoVisible = false
         adapter.notifyItemChanged(position)
-
-        // Auto scroll to the current task position
         recyclerView.smoothScrollToPosition(position)
 
         val success = try {
@@ -534,7 +512,11 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         Toast.makeText(this, doMessage, Toast.LENGTH_SHORT).show()
 
     }
-    private fun enableAdmin() {
+    private suspend fun enableAdmin() {
+        delay(2000)
+        enableAdmin2()
+    }
+    private fun enableAdmin2() {
         if(!isAdminEnabled()) {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Enrollment process")
@@ -555,7 +537,6 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         devicePolicyManager.removeActiveAdmin(adminComponentName)
     }
     private fun isAdminEnabled(): Boolean {
-        val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         return devicePolicyManager.isAdminActive(adminComponentName)
     }
 

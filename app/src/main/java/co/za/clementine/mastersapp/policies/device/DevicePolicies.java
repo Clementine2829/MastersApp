@@ -24,51 +24,67 @@ public class DevicePolicies extends PoliciesManager {
 
 
     public void setPasswordSecurityPolicies() {
-        if (devicePolicyManager.isAdminActive(componentName)) {
-            try {
-                // Only allow PIN and password
-                devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX);
-                devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_COMPLEX);
+        try {
+            Thread.sleep(2000);
+            if (devicePolicyManager.isAdminActive(componentName)) {
+                try {
+                    // Only allow PIN and password
+                    devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX);
+                    devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_COMPLEX);
 
-                // Set minimum PIN length to 8 digits
-                devicePolicyManager.setPasswordMinimumLength(componentName, 8);
+                    // Set minimum PIN length to 8 digits
+                    devicePolicyManager.setPasswordMinimumLength(componentName, 8);
 
-                // Set password expiration timeout to 3 months (90 days)
-//                devicePolicyManager.setPasswordExpirationTimeout(componentName, 90L * 24L * 60L * 60L * 1000L);  // 90 days
+                    // Set password expiration timeout to 3 months (90 days)
+    //                devicePolicyManager.setPasswordExpirationTimeout(componentName, 90L * 24L * 60L * 60L * 1000L);  // 90 days
 
-                // Example: Set password expiration timeout to 5 minutes for testing
-                devicePolicyManager.setPasswordExpirationTimeout(componentName, 2L * 60L * 1000L);  // 5 minutes
+                    // Example: Set password expiration timeout to 5 minutes for testing
+                    devicePolicyManager.setPasswordExpirationTimeout(componentName, 2L * 60L * 1000L);  // 5 minutes
 
-                // Set maximum failed passwords for wipe
-                devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 10);
+                    // Set maximum failed passwords for wipe
+    //                devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 10);
+                    devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, 2);
 
-                showToast("High security policies set");
-            } catch (SecurityException e) {
-                showToast("Failed to set high security policies: " + e.getMessage());
+                    showToast("High security policies set");
+                } catch (SecurityException e) {
+                    showToast("Failed to set high security policies: " + e.getMessage());
+                }
+            } else {
+                showToast("Device Admin not active");
             }
-        } else {
-            showToast("Device Admin not active");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
     public void enforceStorageEncryption() {
-        if (devicePolicyManager.isAdminActive(componentName)) {
-            if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_UNSUPPORTED) {
-                devicePolicyManager.setStorageEncryption(componentName, true);
-                showToast("Storage encryption enforced");
+        try {
+            Thread.sleep(2000);
+            if (devicePolicyManager.isAdminActive(componentName)) {
+                if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_UNSUPPORTED) {
+                    devicePolicyManager.setStorageEncryption(componentName, true);
+                    showToast("Storage encryption enforced");
+                } else {
+                    showToast("Storage encryption is not supported on this device");
+                }
             } else {
-                showToast("Storage encryption is not supported on this device");
+                showToast("Device Admin not active");
             }
-        } else {
-            showToast("Device Admin not active");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
     public void setScreenTimeoutPolicy(long timeoutMillis) {
-        if (devicePolicyManager.isAdminActive(componentName)) {
-            devicePolicyManager.setMaximumTimeToLock(componentName, timeoutMillis);
-            showToast("Screen timeout policy set to " + (timeoutMillis / 1000) + " seconds");
-        } else {
-            showToast("Device Admin not active");
+        try {
+            Thread.sleep(2000);
+            if (devicePolicyManager.isAdminActive(componentName)) {
+                devicePolicyManager.setMaximumTimeToLock(componentName, timeoutMillis);
+                showToast("Screen timeout policy set to " + (timeoutMillis / 1000) + " seconds");
+            } else {
+                showToast("Device Admin not active");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

@@ -49,7 +49,7 @@ class DisclaimerActivity : AppCompatActivity() {
                 finishAffinity()
                 exitProcess(0)
             }
-            builder.setNegativeButton("NO") { dialog, _ ->
+            builder.setNeutralButton("NO") { dialog, _ ->
                 dialog.dismiss()
             }
             val dialog: AlertDialog = builder.create()

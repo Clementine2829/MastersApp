@@ -10,15 +10,20 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
 import co.za.clementine.mastersapp.DeviceOwnerReceiver
+import kotlinx.coroutines.delay
 
 
-class ProfileSelectionDialog(private val context: Context) {
+class ProfileSelectionDialog(
+    private val context: Context,
+    private val dpm: DevicePolicyManager,
+    private val adminComponentName: ComponentName) {
 
     private val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
-    private val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    private val adminComponentName = ComponentName(context, DeviceOwnerReceiver::class.java)
+//    private val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+//    private val adminComponentName = ComponentName(context, DeviceOwnerReceiver::class.java)
 
-    fun showAndSwitchToWorkProfile() {
+    suspend fun showAndSwitchToWorkProfile() {
+        delay(2000)
         val profiles = userManager.userProfiles
         val profileNames = mutableListOf<String>()
 
@@ -33,22 +38,27 @@ class ProfileSelectionDialog(private val context: Context) {
         listView.adapter = arrayAdapter
 
         val alertDialog = android.app.AlertDialog.Builder(context)
-            .setTitle("Select Profile")
-            .setView(listView)
-            .setNegativeButton("Cancel") { dialog, _ ->
+            .setTitle("Switch to work profile")
+//            .setView(listView)
+            .setMessage("Do you want to switch work profile?")
+            .setPositiveButton("Yes") { _, _ ->
+                switchToProfile()
+            }
+            .setNeutralButton("No") { dialog, _ ->
                 dialog.dismiss()
             }
+            .setCancelable(false)
             .create()
 
         // Open user switcher screen when an item in the list is clicked
-        listView.setOnItemClickListener { _, _, position, _ ->
-            val userHandle = profiles[position]
-
-            // Call the switchToProfile method to switch to the new profile
-            switchToProfile()
-
-            alertDialog.dismiss()
-        }
+//        listView.setOnItemClickListener { _, _, position, _ ->
+//            val userHandle = profiles[position]
+//
+//            // Call the switchToProfile method to switch to the new profile
+//            switchToProfile()
+//
+//            alertDialog.dismiss()
+//        }
 
         alertDialog.show()
     }

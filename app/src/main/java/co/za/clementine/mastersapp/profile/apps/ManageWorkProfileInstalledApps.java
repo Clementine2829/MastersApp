@@ -23,13 +23,14 @@ public class ManageWorkProfileInstalledApps {
     private final ComponentName adminComponent;
     private final Context context;
 
-    public ManageWorkProfileInstalledApps(Context context) {
-        devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        adminComponent = new ComponentName(context, DeviceOwnerReceiver.class);
+    public ManageWorkProfileInstalledApps(Context context,
+                                          DevicePolicyManager devicePolicyManager,
+                                          ComponentName adminComponent) {
+        this.devicePolicyManager = devicePolicyManager;
+        this.adminComponent = adminComponent;
         this.context = context;
     }
 
-    // Method to get a list of installed apps in the work profile
     public List<String> getInstalledAppsInWorkProfile() {
         List<String> installedApps = new ArrayList<>();
         PackageManager packageManager = context.getPackageManager();
