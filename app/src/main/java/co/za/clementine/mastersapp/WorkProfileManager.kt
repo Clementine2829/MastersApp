@@ -12,14 +12,33 @@ import android.security.keystore.KeyProperties
 import android.widget.Toast
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import kotlinx.coroutines.delay
 
-class WorkProfileManager(private val context: Context) {
+class WorkProfileManager(
+    private val context: Context,
+    private val dpm: DevicePolicyManager,
+    private val adminComponent: ComponentName) {
 
-    private val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    private val adminComponent = ComponentName(context, DeviceOwnerReceiver::class.java)
+    fun workProfileExist(): Boolean {
+        try {
+            if (!isMultipleUsersEnabled(context)) {
+                showEnableMultipleUsersDialog()
+                return false
+            }
+            if (dpm.isDeviceOwnerApp(context.packageName)) {
+                val existingProfiles = dpm.getSecondaryUsers(adminComponent)
+                return (existingProfiles.size > 0)
+            }
+        } catch (e: SecurityException) {
+                makeToast("Security exception occurred")
+        } catch (e: Exception) {
+            makeToast("An error occurred")
+        }
+        return false
+    }
 
-    fun createWorkProfile() {
-
+    suspend fun createWorkProfile() {
+        delay(2000)
         try {
             if(!isMultipleUsersEnabled(context)){
                 showEnableMultipleUsersDialog()
@@ -27,12 +46,7 @@ class WorkProfileManager(private val context: Context) {
             }
             // Check if the app is already a device owner
             if (dpm.isDeviceOwnerApp(context.packageName)) {
-                // Get existing secondary users (profiles)
-                val existingProfiles = dpm.getSecondaryUsers(adminComponent)
-                if (existingProfiles.size > 0) {
-                    // Another profile already exists, so we cannot create another one
-                    makeToast("Only one additional profile is allowed")
-                } else {
+                if (!workProfileExist()) {
 //                    val flags = DevicePolicyManager.SKIP_SETUP_WIZARD or
 //                                DevicePolicyManager.MAKE_USER_EPHEMERAL or
 //                                DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED
@@ -42,22 +56,17 @@ class WorkProfileManager(private val context: Context) {
 //                        null, flags)
 
                     if (workProfile != null) {
-                        // Work profile created successfully, the setup wizard should be triggered automatically
                         makeToast("Work profile creation initiated")
                     } else {
-                        // Failed to create work profile
                         makeToast("Failed to create work profile")
                     }
                 }
             } else {
-                // Handle case where app is not a device owner
                 makeToast("App is not a device owner")
             }
         } catch (e: SecurityException) {
-            // Handle security exceptions
             makeToast("Security exception occurred")
         } catch (e: Exception) {
-            // Handle other exceptions
             makeToast("An error occurred")
         }
     }
@@ -76,7 +85,9 @@ class WorkProfileManager(private val context: Context) {
     private fun showEnableMultipleUsersDialog() {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Enable Multiple Users")
-        builder.setMessage("To use this feature, you need to enable the 'Multiple users' setting on your device. Would you like to open the settings now?")
+        builder.setMessage("To use this feature, you need to enable the 'Multiple users' setting on your device. " +
+                "Please follow these steps:\n\n1. Open Settings.\n2. Navigate to System settings.\n3. " +
+                "Access Additional settings.\n4. Enable Multiple users.")
         builder.setPositiveButton("Open Settings") { _, _ ->
             val intent = Intent(Settings.ACTION_SETTINGS)
             context.startActivity(intent)
@@ -87,7 +98,6 @@ class WorkProfileManager(private val context: Context) {
         val dialog = builder.create()
         dialog.show()
     }
-
 
     fun navigateToWorkProfileSettings() {
         val intent = Intent()

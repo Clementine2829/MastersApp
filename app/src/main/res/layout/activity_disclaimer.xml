@@ -5,6 +5,16 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+
+    <TextView
+        android:id="@+id/appVersion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_version_1_0_0"
+        android:textColor="@color/black"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center" />
     <ImageView
         android:id="@+id/appIcon"
         android:layout_width="wrap_content"

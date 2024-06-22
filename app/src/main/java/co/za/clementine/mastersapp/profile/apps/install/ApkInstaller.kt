@@ -7,17 +7,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import co.za.clementine.mastersapp.BuildConfig
-import co.za.clementine.mastersapp.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
@@ -39,11 +37,25 @@ class ApkInstaller(private val context: Context) {
     }
 
     private val downloadProgressManager = DownloadProgressManager()
-    private val dismissDownloadPopUp = false;
-    fun downloadAndInstall(apkUrl: String) {
-        downloadProgressManager.showProgressPopup(context)
+    private val dismissDownloadPopUp = false
+    private val fileName = "AirDroid App.apk"
+    fun fileExistsInDownloadDirectory(fileName: String): Boolean {
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(downloadDir, fileName)
+        return file.exists()
+    }
+
+    suspend fun downloadAndInstall(apkUrl: String, packageManager: PackageManager) {
+        delay(2000)
+        if (!isPackageInstalled(packageManager) && !fileExistsInDownloadDirectory(fileName))
+            downloadProgressManager.showProgressPopup(context)
         CoroutineScope(Dispatchers.IO).launch {
-            val apkFile = downloadApk(apkUrl)
+            val apkFile =
+            if (!isPackageInstalled(packageManager) && fileExistsInDownloadDirectory(fileName))
+                getAirDroidInDownloads()
+            else {
+                downloadApk(apkUrl)
+            }
             apkFile?.let {
                 installApk(it)
             }
@@ -52,19 +64,20 @@ class ApkInstaller(private val context: Context) {
 
     private suspend fun downloadApk(apkUrl: String): File? {
         var apkFile: File? = null
-
         withContext(Dispatchers.IO) {
             try {
                 val url = URL(apkUrl)
                 val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
                 connection.connect()
+                println("URL: $apkUrl")
+                println("URL: $url")
+                println("connection: " + connection.responseCode)
 
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                     return@withContext null
                 }
 
                 val input: InputStream = BufferedInputStream(connection.inputStream)
-                val fileName = "downloaded_apk.apk"
                 apkFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
 
                 val output = FileOutputStream(apkFile)
@@ -94,6 +107,11 @@ class ApkInstaller(private val context: Context) {
         return apkFile
     }
 
+    private fun getAirDroidInDownloads(): File {
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        return File(downloadDir, fileName)
+    }
+
     private fun installApk(apkFile: File) {
         val apkUri: Uri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", apkFile)
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -101,6 +119,16 @@ class ApkInstaller(private val context: Context) {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(intent)
+    }
+
+    private fun isPackageInstalled(packageManager: PackageManager): Boolean {
+        val packageName = "com.sand.airdroid";
+        return try {
+            packageManager.getPackageInfo(packageName, 0)
+            true // Package is installed
+        } catch (e: PackageManager.NameNotFoundException) {
+            false // Package is not installed
+        }
     }
 
     private fun createNotificationChannel() {
@@ -143,8 +171,6 @@ class ApkInstaller(private val context: Context) {
     private fun showProgressNotification(progress: Long, max: Int) {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-
-        println(max.toString() + " == " + progress + " ? " + (max.toLong() == progress))
         if (max.toLong() == progress) {
             builder.setContentTitle("Download Complete")
                 .setContentText("AirDroid downloaded successfully")

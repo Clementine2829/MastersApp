@@ -6,7 +6,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 
-class NetworkMonitor(private val context: Context) {
+class NetworkMonitor(context: Context) {
 
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private var networkCallback: ConnectivityManager.NetworkCallback? = null

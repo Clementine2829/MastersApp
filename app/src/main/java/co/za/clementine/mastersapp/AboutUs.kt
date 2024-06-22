@@ -6,17 +6,17 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
-class MoreInfoActivity : AppCompatActivity() {
+class AboutUs : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_more_info)
+        setContentView(R.layout.activity_about_us)
         supportActionBar?.hide()
 
-        val tvMoreInfo = findViewById<TextView>(R.id.tvMoreInfo)
-        val moreInfoContent = getString(R.string.more_info_content)
+        val tvAboutUs = findViewById<TextView>(R.id.tvAboutUs)
+        val aboutUsContent = getString(R.string.about_us_content)
 
-        // Display T&Cs and Privacy Policy content as HTML
-        tvMoreInfo.text = Html.fromHtml(moreInfoContent, Html.FROM_HTML_MODE_COMPACT)
+        // Display about us content as HTML
+        tvAboutUs.text = Html.fromHtml(aboutUsContent, Html.FROM_HTML_MODE_COMPACT)
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()

@@ -9,20 +9,13 @@ import android.os.Build
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import co.za.clementine.mastersapp.DeviceOwnerReceiver
+import kotlinx.coroutines.delay
 import java.io.File
 
-class WorkProfileInstaller(private val context: Context) {
+class WorkProfileInstaller(private val context: Context, private val devicePolicyManager: DevicePolicyManager) {
 
-    private val devicePolicyManager: DevicePolicyManager by lazy {
-        context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    }
-
-    private val componentName: ComponentName by lazy {
-        ComponentName(context, DeviceOwnerReceiver::class.java)
-    }
-
-    fun installApkInWorkProfile(apkFile: File) {
-
+    suspend fun installApkInWorkProfile(apkFile: File) {
+        delay(2000)
         if (isWorkProfileEnabled()) {
             val apkUri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", apkFile)
             val intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {

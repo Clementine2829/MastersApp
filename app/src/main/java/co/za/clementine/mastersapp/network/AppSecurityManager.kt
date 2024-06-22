@@ -4,7 +4,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 
-class AppSecurityManager(private val context: Context) {
+class AppSecurityManager(context: Context) {
     companion object {
         const val REQUEST_CODE_CONFIRM_DEVICE_CREDENTIAL = 1
     }

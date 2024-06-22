@@ -1,5 +1,6 @@
 package co.za.clementine.mastersapp
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -15,6 +16,7 @@ class DisclaimerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_disclaimer)
+        supportActionBar?.hide()
 
         val appIcon = findViewById<ImageView>(R.id.appIcon)
         val disclaimerText = findViewById<TextView>(R.id.disclaimerText)
@@ -28,12 +30,10 @@ class DisclaimerActivity : AppCompatActivity() {
             securityManager!!.requestAuthentication(this);
         }
 
-
         appIcon.setImageResource(R.drawable.ic_launcher_background)  // Replace with your app icon resource
         disclaimerText.text = getString(R.string.disclaimer_text)
 
         btnAgree.setOnClickListener {
-            // Proceed to main activity or the next step
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
@@ -41,10 +41,22 @@ class DisclaimerActivity : AppCompatActivity() {
 
 
         btnCancel.setOnClickListener {
-            // Exit the app or go back
-            finishAffinity()
-            exitProcess(0)
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Exit App")
+            builder.setMessage("Are you sure you want to exit? Canceling will close the app.")
+
+            builder.setPositiveButton("YES") { _, _ ->
+                finishAffinity()
+                exitProcess(0)
+            }
+            builder.setNeutralButton("NO") { dialog, _ ->
+                dialog.dismiss()
+            }
+            val dialog: AlertDialog = builder.create()
+            dialog.setCancelable(false)
+            dialog.show()
         }
+
 
         btnMoreInfo.setOnClickListener {
             // Open a web page or activity with more information about T&Cs and Privacy Policy

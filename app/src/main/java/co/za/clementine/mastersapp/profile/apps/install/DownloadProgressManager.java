@@ -29,6 +29,7 @@ public class DownloadProgressManager {
 
         builder.setView(view);
         dialog = builder.create();
+        dialog.setCancelable(false);
         dialog.show();
     }
 
@@ -43,6 +44,7 @@ public class DownloadProgressManager {
                 progressBar.setProgress(progress);
                 progressText.setText(progressPercentage);
                 progressSize.setText(String.format("%s / %s", downloadedSize, totalSize));
+                if(downloadedSize.equals(totalSize)) dialog.dismiss();
             });
         }
         if(downloadedBytes == totalBytes) dismissProgressPopup();
