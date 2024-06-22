@@ -28,30 +28,6 @@
     <string name="agree">Agree</string>
     <string name="cancel">Cancel</string>
     <string name="more_info">More Info</string>
-    <string name="more_info_content">
-    <![CDATA[
-    <h2>Terms & Conditions</h2>
-    <p>Welcome to Clementine Masters App. By using this app, you agree to the following terms and conditions:</p>
-    <ul>
-        <li><b>Usage:</b> This app is designed to help you create and switch work profiles on your device. You must use the app in compliance with all applicable laws and regulations.</li>
-        <li><b>Device Owner:</b> The app has device owner capabilities and can make changes to the device, such as installing or uninstalling apps, setting device policies, and managing network settings.</li>
-        <li><b>Data Management:</b> The app may require access to certain device data and permissions to function properly. These include, but are not limited to, Wi-Fi settings, Bluetooth settings, and storage access.</li>
-        <li><b>Updates:</b> We may update the app from time to time, and these updates may be automatically installed on your device. You agree to such updates as part of your use of the app.</li>
-        <li><b>Liability:</b> We are not liable for any damage or data loss that may occur as a result of using this app. Use the app at your own risk.</li>
-    </ul>
-
-    <h2>User Privacy</h2>
-    <p>Your privacy is important to us. This section outlines how we handle your personal data:</p>
-    <ul>
-        <li><b>Data Collection:</b> We do not collect any personal data without your explicit consent. The app only accesses the data necessary to perform its functions.</li>
-        <li><b>Data Usage:</b> Any data accessed by the app is used solely for the purpose of creating and managing work profiles and enforcing device policies.</li>
-        <li><b>Data Sharing:</b> We do not share your personal data with third parties. Your data is kept secure and used only within the app.</li>
-        <li><b>Permissions:</b> The app requires various permissions to function correctly. You can review these permissions during the app setup process.</li>
-        <li><b>Security:</b> We implement reasonable security measures to protect your data from unauthorized access or disclosure.</li>
-        <li><b>Contact Us:</b> If you have any questions or concerns about your privacy, please contact us at <a href="mailto:support@clementinemastersapp.co.za">support@clementinemastersapp.co.za</a>.</li>
-    </ul>
-    ]]>
-</string>
     <string name="retry">Retry</string>
     <string name="undo">Undo</string>
     <string name="pending">Pending</string>
@@ -59,5 +35,80 @@
     <string name="masters_app">Masters App</string>
     <string name="home_page">Home page</string>
     <string name="app_version_1_0_0">App Version: 1.0.0</string>
+    <string name="quit_app">Quit app</string>
+    <string name="t_amp_cs"><![CDATA[T & Cs]]></string>
+    <string name="more_info_content">
+        <![CDATA[
+        <h2>Terms & Conditions</h2><br>
+        <p>Welcome to Clementine Masters App. By using this app, you agree to the following terms and conditions:</p><br>
+        <ul>
+            <li><b>Usage:</b> This app is designed to help you create and switch work profiles on your device. You must use the app in compliance with all applicable laws and regulations.</li>
+            <li><b>Device Owner:</b> The app has device owner capabilities and can make changes to the device, such as installing or uninstalling apps, setting device policies, and managing network settings.</li>
+            <li><b>Data Management:</b> The app may require access to certain device data and permissions to function properly. These include, but are not limited to, Wi-Fi settings, Bluetooth settings, and storage access.</li>
+            <li><b>Updates:</b> We may update the app from time to time, and these updates may be automatically installed on your device. You agree to such updates as part of your use of the app.</li>
+            <li><b>Liability:</b> We are not liable for any damage or data loss that may occur as a result of using this app. Use the app at your own risk.</li>
+        </ul>
+        <br>
+
+        <h2>User Privacy</h2>
+        <p>Your privacy is important to us. This section outlines how we handle your personal data:</p><br>
+        <ul>
+            <li><b>Data Collection:</b> We do not collect any personal data without your explicit consent. The app only accesses the data necessary to perform its functions.</li>
+            <li><b>Data Usage:</b> Any data accessed by the app is used solely for the purpose of creating and managing work profiles and enforcing device policies.</li>
+            <li><b>Data Sharing:</b> We do not share your personal data with third parties. Your data is kept secure and used only within the app.</li>
+            <li><b>Permissions:</b> The app requires various permissions to function correctly. You can review these permissions during the app setup process.</li>
+            <li><b>Security:</b> We implement reasonable security measures to protect your data from unauthorized access or disclosure.</li>
+            <li><b>Contact Us:</b> If you have any questions or concerns about your privacy, please contact us at <a href="mailto:support@clementinemastersapp.co.za">support@clementinemastersapp.co.za</a>.</li>
+        </ul>
+        ]]>
+    </string>
+    <string name="about_us_content">
+        <![CDATA[
+        <h2>About Masters App</h2><br>
+
+        <h3>Our Story</h3>
+        <p>Welcome to the <strong>Masters app</strong>, where innovation meets practicality. As an
+        academic project developed by Clementine Mamogale, a dedicated student at the University of
+        Johannesburg, and under the guidance of Prof. Noluntu Mpekoa, we are passionate about simplifying
+        work profile management for users like you.</p><br>
+
+        <h3>Our Mission</h3>
+        <p>At Masters App, our mission is clear: to empower professionals by streamlining work
+        profiles on their devices. We believe that efficient workspaces lead to productivity, and our
+        app is designed to make your life easier.</p><br>
+
+        <h3>What Sets Us Apart</h3>
+        <ul>
+            <li><strong>Academic Roots:</strong> We are not just another app; we are a labor of
+            love born in the academic halls of the University of Johannesburg. Our commitment to
+            excellence drives every line of code we write.</li>
+            <li><strong>User-Centric Approach:</strong> We put you, the user, at the center of
+            everything we do. Your feedback shapes our features, and your success is our ultimate goal.</li>
+            <li><strong>Supervised Innovation:</strong> Prof. Noluntu Mpekoa s guidance ensures that
+            our app adheres to the highest standards of quality and functionality.</li>
+        </ul><br>
+
+        <h3>Our Values</h3>
+        <ul>
+            <li><strong>Integrity:</strong> We uphold the highest ethical standards in our work,
+            ensuring transparency and trust.</li>
+            <li><strong>Innovation:</strong> We embrace creativity and continuous improvement,
+            pushing boundaries to deliver exceptional solutions.</li>
+            <li><strong>Empathy:</strong> We understand the challenges you face, and our app
+            reflects our empathy toward your needs.</li>
+        </ul><br>
+
+        <h3>Contact Us</h3>
+        <p>Have questions or want to learn more? Reach out to us at
+        <a href="mailto:216025117@student.uj.ac.za">Clementine Mamogale</a>. We would love to hear from you!</p>
+        <br><br>
+        <i>Additional information: This app is an academic project for my studies at the University
+        of Johannesburg, developed by myself (Clementine Mamogale) under the supervision of Prof.
+        Noluntu Mpekoa.<i>
+        ]]>
+    </string>
+    <string name="about">About</string>
+
+
 
 </resources>
