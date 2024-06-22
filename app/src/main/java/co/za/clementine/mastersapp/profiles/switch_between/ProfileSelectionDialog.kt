@@ -11,6 +11,7 @@ import android.widget.ListView
 import android.widget.Toast
 import co.za.clementine.mastersapp.DeviceOwnerReceiver
 import kotlinx.coroutines.delay
+import kotlin.system.exitProcess
 
 
 class ProfileSelectionDialog(
@@ -69,12 +70,19 @@ class ProfileSelectionDialog(
             if (userHandles.isNotEmpty()) {
                 val targetUserHandle = userHandles[0]
                 dpm.switchUser(adminComponentName, targetUserHandle)
+                quitApp()
             } else{
                 Toast.makeText(context, "User empty", Toast.LENGTH_SHORT).show()
             }
         } else{
             println("App is not device manager")
         }
+    }
+
+    private fun  quitApp(){
+        val a:Activity = context as Activity
+        a.finishAffinity()
+        exitProcess(0)
     }
 //    fun switchToAdminProfile() {
 //

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import co.za.clementine.mastersapp.MainActivity
 import co.za.clementine.mastersapp.R
 
 class TaskAdapter(
@@ -22,9 +23,9 @@ class TaskAdapter(
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = tasks[position]
         holder.taskName.text = task.name
-        holder.taskStatus.text = task.status
+        holder.taskStatus.text = task.status.toString()
         holder.taskStatus.setTextColor(
-            if (task.status == "Completed") holder.itemView.context.getColor(R.color.green)
+            if (task.status == MainActivity.TaskEnum.COMPLETED) holder.itemView.context.getColor(R.color.green)
             else holder.itemView.context.getColor(R.color.red)
         )
         holder.btnRetry.visibility = if (task.retryVisible) View.VISIBLE else View.GONE

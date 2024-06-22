@@ -69,6 +69,9 @@ class ApkInstaller(private val context: Context) {
                 val url = URL(apkUrl)
                 val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
                 connection.connect()
+                println("URL: $apkUrl")
+                println("URL: $url")
+                println("connection: " + connection.responseCode)
 
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                     return@withContext null
