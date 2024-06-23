@@ -5,75 +5,42 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <!-- RecyclerView to display content -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/relativeLayout"
+        android:scrollbarStyle="insideOverlay" />
 
-<!--    <LinearLayout-->
-<!--        android:id="@+id/top_bar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:paddingStart="8dp"-->
-<!--        android:paddingEnd="8dp"-->
-<!--        android:background="@color/gray"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent">-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/btnBack"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:src="@drawable/ic_back"-->
-<!--            android:backgroundTint="@color/gray" />-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/btnPageTitle"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:textAlignment="textStart"-->
-<!--            android:gravity="start"-->
-<!--            android:textColor="@color/black"-->
-<!--            android:textStyle="bold"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            android:text="@string/home_page"-->
-<!--            android:textSize="18sp" />-->
-
-<!--    </LinearLayout>-->
-
+    <!-- Buttons at the bottom -->
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp">
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbarStyle="insideOverlay" />
+        <Button
+            android:id="@+id/btnUndoAdmin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:text="@string/undo_admin" />
+
+        <Button
+            android:id="@+id/btnWorkProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginEnd="@dimen/margin_normal"
+            android:text="@string/work_profile" />
+
     </LinearLayout>
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@+id/linearLayout"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        android:layout_marginStart="0dp"-->
-<!--        android:layout_marginTop="343dp"-->
-<!--        android:layout_marginEnd="0dp">-->
-
-<!--        <androidx.recyclerview.widget.RecyclerView-->
-<!--            android:id="@+id/recyclerView2"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:scrollbarStyle="insideOverlay" />-->
-<!--    </LinearLayout>-->
 
 </RelativeLayout>

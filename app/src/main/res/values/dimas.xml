@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_one_pixel">1dp</dimen>
+    <dimen name="padding_small">3dp</dimen>
+    <dimen name="padding_mid_small">5dp</dimen>
+    <dimen name="padding_mini_normal">7dp</dimen>
+    <dimen name="padding_normal">10dp</dimen>
+    <dimen name="padding_large">15dp</dimen>
+    <dimen name="padding_x_large">20dp</dimen>
+    <dimen name="padding_xx_large">25dp</dimen>
+    <dimen name="padding_xxx_large">30dp</dimen>
+
+    <dimen name="margin_small">3dp</dimen>
+    <dimen name="margin_mid_small">5dp</dimen>
+    <dimen name="margin_normal">10dp</dimen>
+    <dimen name="margin_large">15dp</dimen>
+    <dimen name="margin_x_large">20dp</dimen>
+    <dimen name="margin_xx_large">25dp</dimen>
+    <dimen name="margin_xxx_large">30dp</dimen>
+    <dimen name="margin_x4_large">40dp</dimen>
+
+    <dimen name="text_size_very_small">8sp</dimen>
+    <dimen name="text_size_mini_small">10sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_mid_small">14sp</dimen>
+    <dimen name="text_size_normal">16sp</dimen>
+    <dimen name="text_size_x_normal">18sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_x_large">25sp</dimen>
+
+</resources>

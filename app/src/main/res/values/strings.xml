@@ -108,7 +108,9 @@
         ]]>
     </string>
     <string name="about">About</string>
-
+    <string name="refresh">Refresh</string>
+    <string name="work_profile">Work profile</string>
+    <string name="undo_admin">Undo admin</string>
 
 
 </resources>

@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class AppSecurityManager {
     private static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIAL = 1;
-    private KeyguardManager keyguardManager;
+    private final KeyguardManager keyguardManager;
     private boolean isAuthenticated;
 
     public AppSecurityManager(Context context) {

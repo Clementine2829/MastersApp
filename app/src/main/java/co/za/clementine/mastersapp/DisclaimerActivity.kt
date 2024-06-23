@@ -24,11 +24,11 @@ class DisclaimerActivity : AppCompatActivity() {
         val btnCancel = findViewById<Button>(R.id.btnCancel)
         val btnMoreInfo = findViewById<TextView>(R.id.btnMoreInfo)
 
-        securityManager = AppSecurityManager(this);
+//        securityManager = AppSecurityManager(this);
 
-        if (!securityManager!!.isUserAuthenticated) {
-            securityManager!!.requestAuthentication(this);
-        }
+//        if (!securityManager!!.isUserAuthenticated) {
+//            securityManager!!.requestAuthentication(this);
+//        }
 
         appIcon.setImageResource(R.drawable.ic_launcher_background)  // Replace with your app icon resource
         disclaimerText.text = getString(R.string.disclaimer_text)
@@ -38,7 +38,6 @@ class DisclaimerActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
 
         btnCancel.setOnClickListener {
             val builder = AlertDialog.Builder(this)
@@ -66,14 +65,18 @@ class DisclaimerActivity : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
-        if (!securityManager!!.isUserAuthenticated) {
-            securityManager!!.requestAuthentication(this)
-        }
+//        if (!securityManager!!.isUserAuthenticated) {
+//            securityManager!!.requestAuthentication(this)
+//        }
     }
-    @Deprecated("Deprecated in Java")
+    @Deprecated("Deprecated in Java", ReplaceWith(
+        "super.onActivityResult(requestCode, resultCode, data)",
+        "androidx.appcompat.app.AppCompatActivity"
+        )
+    )
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        securityManager!!.handleAuthenticationResult(requestCode, resultCode)
+//        securityManager!!.handleAuthenticationResult(requestCode, resultCode)
 //        if (!securityManager!!.isUserAuthenticated) {
 //            // Handle the case where authentication failed
 //            finish() // or take other appropriate action

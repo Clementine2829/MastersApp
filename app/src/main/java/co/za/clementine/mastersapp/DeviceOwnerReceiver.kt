@@ -54,7 +54,7 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
 
         // Display a custom lock screen message
         dpm.setOrganizationName(adminComponent, "Masters App")
-        dpm.setDeviceOwnerLockScreenInfo(adminComponent, "This device is managed by Masters App. Contact IT support for assistance.")
+        dpm.setDeviceOwnerLockScreenInfo(adminComponent, "This device is managed by Masters App. Contact IT for assistance.")
 
         disableCamera(dpm, adminComponent)
 
