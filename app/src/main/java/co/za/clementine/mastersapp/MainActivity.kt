@@ -272,31 +272,32 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                                 workProfileManager.createWorkProfile()
                             } else{
                                 workProfileManager.showEnableMultipleUsersDialog()
-                                throw MyCustomException("security policy exception")
+                                println("isMultipleUsersEnabled? Not enabled")
+                                throw MyCustomException(/*"security policy exception"*/)
                             }
                         } else {
                             showPolicyDialog(this)
-                            throw MyCustomException("security policy exception")
+                            throw MyCustomException(/*"security policy exception"*/)
                         }
                     },
                     undoAction = ::foo),
-                Task(name = "Switch to work profile",
-                    status = if (workProfileManager.workProfileExist()) TaskEnum.COMPLETED else TaskEnum.PENDING,
-                    action = {
-                        if(devicePolicies.areSecurityPoliciesEnforced()){
-                            if(workProfileManager.isMultipleUsersEnabled(this)){
-                                val profileSelectionDialog = ProfileSelectionDialog(this, devicePolicyManager, adminComponentName)
-                                profileSelectionDialog.showAndSwitchToWorkProfile()
-                            } else{
-                                workProfileManager.showEnableMultipleUsersDialog()
-                                throw MyCustomException("security policy exception")
-                            }
-                        } else {
-                            showPolicyDialog(this)
-                            throw MyCustomException("security policy exception")
-                        }
-                    },
-                    undoAction = ::foo),
+//                Task(name = "Switch to work profile",
+//                    status = if (workProfileManager.workProfileExist()) TaskEnum.COMPLETED else TaskEnum.PENDING,
+//                    action = {
+//                        if(devicePolicies.areSecurityPoliciesEnforced()){
+//                            if(workProfileManager.isMultipleUsersEnabled(this)){
+//                                val profileSelectionDialog = ProfileSelectionDialog(this, devicePolicyManager, adminComponentName)
+//                                profileSelectionDialog.showAndSwitchToWorkProfile()
+//                            } else{
+////                                workProfileManager.showEnableMultipleUsersDialog()
+//                                throw MyCustomException(/*"security policy exception"*/)
+//                            }
+//                        } else {
+//                            showPolicyDialog(this)
+//                            throw MyCustomException(/*"security policy exception"*/)
+//                        }
+//                    },
+//                    undoAction = ::foo),
 //                Task(
 //                    name = "Exit Lock Task Mode",
 //                    status = TaskEnum.PENDING,

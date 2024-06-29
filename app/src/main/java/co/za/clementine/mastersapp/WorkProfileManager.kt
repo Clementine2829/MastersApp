@@ -23,17 +23,19 @@ class WorkProfileManager(
     fun workProfileExist(): Boolean {
         try {
             if (!isMultipleUsersEnabled(context)) {
-                showEnableMultipleUsersDialog()
-                throw MyCustomException("security policy exception")
+//                showEnableMultipleUsersDialog()
+                throw MyCustomException(/*"security policy exception"*/)
             }
             if (dpm.isDeviceOwnerApp(context.packageName)) {
                 val existingProfiles = dpm.getSecondaryUsers(adminComponent)
                 return (existingProfiles.size > 0)
             }
         } catch (e: SecurityException) {
-                makeToast("Security exception occurred")
+//            makeToast("Security exception occurred")
+            e.printStackTrace()
         } catch (e: Exception) {
-            makeToast("An error occurred")
+//            makeToast("An error occurred")
+            e.printStackTrace()
         }
         return false
     }
@@ -42,7 +44,7 @@ class WorkProfileManager(
         try {
             if(!isMultipleUsersEnabled(context)){
                 showEnableMultipleUsersDialog()
-                throw MyCustomException("security policy exception")
+                throw MyCustomException(/*"security policy exception"*/)
             }
             // Check if the app is already a device owner
             if (dpm.isDeviceOwnerApp(context.packageName)) {
@@ -65,22 +67,32 @@ class WorkProfileManager(
                 makeToast("App is not a device owner")
             }
         } catch (e: SecurityException) {
-            makeToast("Security exception occurred")
-            throw MyCustomException("Security exception occurred")
+//            makeToast("Security exception occurred")
+            throw MyCustomException(/*"Security exception occurred"*/)
         } catch (e: Exception) {
-            makeToast("An error occurred")
-            throw MyCustomException("An error occurred")
+//            makeToast("An error occurred")
+            e.printStackTrace()
+            throw MyCustomException(/*"An error occurred"*/)
         }
     }
 
 
+//    fun isMultipleUsersEnabled(context: Context): Boolean {
+//        return try {
+//            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled")
+//            pref == 1 && UserManager.supportsMultipleUsers()
+//        } catch (e: Settings.SettingNotFoundException) {
+//            println("user_switcher_enabled setting not found: ${e.message}")
+//            throw MyCustomException(/*"security policy exception"*/)
+//        }
+//    }
     fun isMultipleUsersEnabled(context: Context): Boolean {
         return try {
-            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled")
+            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled", 0)
             pref == 1 && UserManager.supportsMultipleUsers()
-        } catch (e: Settings.SettingNotFoundException) {
-            println("user_switcher_enabled setting not found: ${e.message}")
-            throw MyCustomException("security policy exception")
+        } catch (e: Exception) {
+            println("An error occurred: ${e.message}")
+            throw MyCustomException(/*"security policy exception"*/)
         }
     }
 
