@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -151,6 +152,13 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         if (!networkMonitor.isNetworkAvailable()) {
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val message = "Are you sure you want to exit? This action will close the app."
+                confirmPopUpAction("Exit App", message, { exitProcess(0) }, { })
+            }
+        })
 
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -380,13 +388,14 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
     }
 
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        super.onBackPressed()
+//    @Deprecated("Deprecated in Java")
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//
+//        val message = "Are you sure you want to exit? This action will close the app."
+//        confirmPopUpAction("Exit App", message, { exitProcess(0) }, { })
+//    }
 
-        val message = "Are you sure you want to exit? This action will close the app."
-        confirmPopUpAction("Exit App", message, { exitProcess(0) }, { })
-    }
 
     private fun retryTask(position: Int) {
         lifecycleScope.launch {
