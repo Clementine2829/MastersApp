@@ -7,6 +7,9 @@
         android:id="@+id/terms_and_conditions"
         android:title="@string/t_amp_cs"/>
     <item
+        android:id="@+id/refresh"
+        android:title="@string/refresh"/>
+    <item
         android:id="@+id/quit"
         android:title="@string/quit_app"/>
 </menu>

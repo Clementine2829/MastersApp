@@ -1,7 +1,5 @@
 package co.za.clementine.mastersapp.policies.device;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -10,43 +8,60 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import co.za.clementine.mastersapp.DeviceOwnerReceiver;
-
 public abstract class PoliciesManager {
-    protected static DevicePolicyManager devicePolicyManager;
-    protected static ComponentName componentName;
+
     protected  Context context;
 
-    public void verifyPolicies() {
+    public enum PasswordQuality {
+        UNSPECIFIED("UNSPECIFIED"),
+        BIOMETRIC_WEAK("BIOMETRIC WEAK"),
+        SOMETHING("SOMETHING"),
+        NUMERIC("NUMERIC"),
+        COMPLEX("COMPLEX"),
+        ALPHANUMERIC("ALPHANUMERIC"),
+        UNKNOWN("UNKNOWN");
+
+        private final String value;
+
+        PasswordQuality(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public void verifyPasswordPolicies(DevicePolicyManager devicePolicyManager, ComponentName componentName) {
         int passwordQuality = devicePolicyManager.getPasswordQuality(componentName);
         int maxFailedPasswordsForWipe = devicePolicyManager.getMaximumFailedPasswordsForWipe(componentName);
 
-        String passwordQualityStr;
+        PasswordQuality passwordQualityEnum;
         switch (passwordQuality) {
             case DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED:
-                passwordQualityStr = "UNSPECIFIED";
+                passwordQualityEnum = PasswordQuality.UNSPECIFIED;
                 break;
             case DevicePolicyManager.PASSWORD_QUALITY_BIOMETRIC_WEAK:
-                passwordQualityStr = "BIOMETRIC WEAK";
+                passwordQualityEnum = PasswordQuality.BIOMETRIC_WEAK;
                 break;
             case DevicePolicyManager.PASSWORD_QUALITY_SOMETHING:
-                passwordQualityStr = "SOMETHING";
+                passwordQualityEnum = PasswordQuality.SOMETHING;
                 break;
             case DevicePolicyManager.PASSWORD_QUALITY_NUMERIC:
-                passwordQualityStr = "NUMERIC";
+                passwordQualityEnum = PasswordQuality.NUMERIC;
                 break;
             case DevicePolicyManager.PASSWORD_QUALITY_COMPLEX:
-                passwordQualityStr = "COMPLEX";
+                passwordQualityEnum = PasswordQuality.COMPLEX;
                 break;
             case DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC:
-                passwordQualityStr = "ALPHANUMERIC";
+                passwordQualityEnum = PasswordQuality.ALPHANUMERIC;
                 break;
             default:
-                passwordQualityStr = "UNKNOWN";
+                passwordQualityEnum = PasswordQuality.UNKNOWN;
                 break;
         }
 
-        showToast("Password Quality: " + passwordQualityStr);
+        showToast("Password Quality: " + passwordQualityEnum);
         showToast("Max Failed Passwords for Wipe: " + maxFailedPasswordsForWipe);
     }
     public static void removeDeviceAdmin(DevicePolicyManager devicePolicyManager, ComponentName componentName, Context context) {
@@ -73,39 +88,24 @@ public abstract class PoliciesManager {
         }
     }
 
-    public static boolean arePoliciesApplied(DevicePolicyManager devicePolicyManager, ComponentName componentName) {
-        // Check if the necessary policies are set
-        int passwordQuality = devicePolicyManager.getPasswordQuality(componentName);
-        int minPasswordLength = devicePolicyManager.getPasswordMinimumLength(componentName);
-        int encryptionStatus = devicePolicyManager.getStorageEncryptionStatus();
-
-        boolean isPasswordQualitySufficient = passwordQuality >= DevicePolicyManager.PASSWORD_QUALITY_COMPLEX;
-        boolean isPasswordLengthSufficient = minPasswordLength >= 8;
-        boolean isStorageEncrypted = encryptionStatus == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE;
-
-        return isPasswordQualitySufficient && isPasswordLengthSufficient && isStorageEncrypted;
-    }
-
     public static void showPolicyDialog(Context context) {
         String message = "The following policies must be set:\n\n" +
-                "1. Password Quality: Must be complex.\n" +
-                "   - Go to Settings > Security > Screen Lock and set a strong password.\n\n" +
-                "2. Minimum Password Length: Must be at least 8 characters.\n" +
-                "   - Ensure your password is at least 8 characters long.\n\n" +
-                "3. Storage Encryption: Device storage must be encrypted.\n" +
-                "   - Go to Settings > Security > Encryption & credentials and encrypt your device if it is not already encrypted.\n";
+                "1. Set complex password on device.\n" +
+                "   -> Go to Settings > Security > Screen Lock and set a strong password.\n\n" +
+                "2. Device storage must be encrypted.\n" +
+                "   -> Go to Settings > Security > Encryption & credentials and encrypt your device if it is not already encrypted.\n";
 
         new AlertDialog.Builder(context)
                 .setTitle("Required Policies")
                 .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                .setNeutralButton("SETTINGS", (dialog, which) -> openDeviceSettings(context))
+                .setPositiveButton("OPEN SETTINGS", (dialog, which) -> openDeviceSettings(context))
+                .setNeutralButton("OK", (dialog, which) -> dialog.dismiss())
                 .setCancelable(false)
                 .create()
                 .show();
     }
     private static void openDeviceSettings(Context context) {
-        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+        Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

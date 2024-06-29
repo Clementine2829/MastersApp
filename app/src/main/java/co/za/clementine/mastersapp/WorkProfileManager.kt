@@ -12,6 +12,7 @@ import android.security.keystore.KeyProperties
 import android.widget.Toast
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import co.za.clementine.mastersapp.exceptions.MyCustomException
 import kotlinx.coroutines.delay
 
 class WorkProfileManager(
@@ -22,27 +23,28 @@ class WorkProfileManager(
     fun workProfileExist(): Boolean {
         try {
             if (!isMultipleUsersEnabled(context)) {
-                showEnableMultipleUsersDialog()
-                return false
+//                showEnableMultipleUsersDialog()
+                throw MyCustomException(/*"security policy exception"*/)
             }
             if (dpm.isDeviceOwnerApp(context.packageName)) {
                 val existingProfiles = dpm.getSecondaryUsers(adminComponent)
                 return (existingProfiles.size > 0)
             }
         } catch (e: SecurityException) {
-                makeToast("Security exception occurred")
+//            makeToast("Security exception occurred")
+            e.printStackTrace()
         } catch (e: Exception) {
-            makeToast("An error occurred")
+//            makeToast("An error occurred")
+            e.printStackTrace()
         }
         return false
     }
 
-    suspend fun createWorkProfile() {
-        delay(2000)
+    fun createWorkProfile() {
         try {
             if(!isMultipleUsersEnabled(context)){
                 showEnableMultipleUsersDialog()
-                return
+                throw MyCustomException(/*"security policy exception"*/)
             }
             // Check if the app is already a device owner
             if (dpm.isDeviceOwnerApp(context.packageName)) {
@@ -65,24 +67,36 @@ class WorkProfileManager(
                 makeToast("App is not a device owner")
             }
         } catch (e: SecurityException) {
-            makeToast("Security exception occurred")
+//            makeToast("Security exception occurred")
+            throw MyCustomException(/*"Security exception occurred"*/)
         } catch (e: Exception) {
-            makeToast("An error occurred")
+//            makeToast("An error occurred")
+            e.printStackTrace()
+            throw MyCustomException(/*"An error occurred"*/)
         }
     }
 
 
-    private fun isMultipleUsersEnabled(context: Context): Boolean {
+//    fun isMultipleUsersEnabled(context: Context): Boolean {
+//        return try {
+//            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled")
+//            pref == 1 && UserManager.supportsMultipleUsers()
+//        } catch (e: Settings.SettingNotFoundException) {
+//            println("user_switcher_enabled setting not found: ${e.message}")
+//            throw MyCustomException(/*"security policy exception"*/)
+//        }
+//    }
+    fun isMultipleUsersEnabled(context: Context): Boolean {
         return try {
-            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled")
+            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled", 0)
             pref == 1 && UserManager.supportsMultipleUsers()
-        } catch (e: Settings.SettingNotFoundException) {
-            println("user_switcher_enabled setting not found: ${e.message}")
-            false
+        } catch (e: Exception) {
+            println("An error occurred: ${e.message}")
+            throw MyCustomException(/*"security policy exception"*/)
         }
     }
 
-    private fun showEnableMultipleUsersDialog() {
+    fun showEnableMultipleUsersDialog() {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Enable Multiple Users")
         builder.setMessage("To use this feature, you need to enable the 'Multiple users' setting on your device. " +

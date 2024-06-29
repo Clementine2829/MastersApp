@@ -3,21 +3,20 @@ package co.za.clementine.mastersapp.policies.device;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.UserManager;
-import android.widget.Toast;
 
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
 
 public class DevicePolicies extends PoliciesManager {
+    private DevicePolicyManager devicePolicyManager;
+    private ComponentName componentName;
     private final int _passwordMinLength = 8;
     private final long _passwordExpirationTimeout = 2L * 60L * 1000L; // 5 minutes
     private final int _maxFailedPasswordsForWipe = 2;
     private final long timeoutMillis = 100000; // 100 seconds
     public DevicePolicies(Context context) {
-        devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        componentName = new ComponentName(context, DeviceOwnerReceiver.class);
+        this.devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        this.componentName = new ComponentName(context, DeviceOwnerReceiver.class);
         this.context = context;
-        verifyPolicies();
     }
 
     public boolean areSecurityPoliciesEnforced() {

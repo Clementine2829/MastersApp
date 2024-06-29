@@ -23,8 +23,7 @@ class ProfileSelectionDialog(
 //    private val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
 //    private val adminComponentName = ComponentName(context, DeviceOwnerReceiver::class.java)
 
-    suspend fun showAndSwitchToWorkProfile() {
-        delay(2000)
+    fun showAndSwitchToWorkProfile() {
         val profiles = userManager.userProfiles
         val profileNames = mutableListOf<String>()
 
@@ -64,7 +63,7 @@ class ProfileSelectionDialog(
         alertDialog.show()
     }
 
-    private fun switchToProfile() {
+    fun switchToProfile() {
         if (dpm.isDeviceOwnerApp(context.packageName)) {
             val userHandles = dpm.getSecondaryUsers(adminComponentName)
             if (userHandles.isNotEmpty()) {

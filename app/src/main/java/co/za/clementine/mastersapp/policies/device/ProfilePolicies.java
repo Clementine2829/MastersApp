@@ -8,7 +8,14 @@ import android.os.UserManager;
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
 
 public class ProfilePolicies extends PoliciesManager{
-    public void setWorkProfileRestrictions(Context context, DevicePolicyManager devicePolicyManager, ComponentName componentName) {
+    DevicePolicyManager devicePolicyManager;
+    ComponentName componentName;
+    public ProfilePolicies(DevicePolicyManager devicePolicyManager, ComponentName componentName) {
+        this.devicePolicyManager = devicePolicyManager;
+        this.componentName = componentName;
+    }
+
+    public void setWorkProfileRestrictions() {
         try {
             Thread.sleep(2000);
             if (devicePolicyManager.isProfileOwnerApp(context.getPackageName())) {
