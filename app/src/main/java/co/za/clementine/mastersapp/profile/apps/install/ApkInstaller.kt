@@ -1,6 +1,7 @@
 package co.za.clementine.mastersapp.profile.apps.install
 
 import android.Manifest
+import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -11,6 +12,7 @@ import android.os.Environment
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.FileProvider
 import co.za.clementine.mastersapp.BuildConfig
 import kotlinx.coroutines.CoroutineScope
@@ -90,11 +92,11 @@ class ApkInstaller(private val context: Context) {
                     totalBytes += count
                     output.write(data, 0, count)
 //                    Log.d("ApkInstaller", "Downloaded $totalBytes / $fileLength bytes")
-                    showProgressNotification(totalBytes, fileLength)
+                    showProgressNotification(context, totalBytes, fileLength)
                     downloadProgressManager.updateProgress(totalBytes, fileLength.toLong())
 //                    (context as MainActivity).updateProgressBar(totalBytes.toInt(), fileLength)
                 }
-                showProgressNotification(totalBytes, fileLength)
+                showProgressNotification(context, totalBytes, fileLength)
 
                 output.flush()
                 output.close()
@@ -107,12 +109,12 @@ class ApkInstaller(private val context: Context) {
         return apkFile
     }
 
-    private fun getAirDroidInDownloads(): File {
+    fun getAirDroidInDownloads(): File {
         val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         return File(downloadDir, fileName)
     }
 
-    private fun installApk(apkFile: File) {
+    fun installApk(apkFile: File) {
         val apkUri: Uri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", apkFile)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(apkUri, "application/vnd.android.package-archive")
@@ -168,9 +170,48 @@ class ApkInstaller(private val context: Context) {
 //            notify(NOTIFICATION_ID, builder.build())
 //        }
 //    }
-    private fun showProgressNotification(progress: Long, max: Int) {
+
+    private fun startDownload(uri: Uri, downloadManager: DownloadManager): Long {
+//        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val request = DownloadManager.Request(uri)
+            .setTitle("Downloading File")
+            .setDescription("Please wait...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+        return downloadManager.enqueue(request)
+    }
+//    private fun showProgressNotification(progress: Long, max: Int) {
+//        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+//            .setPriority(NotificationCompat.PRIORITY_LOW)
+//        if (max.toLong() == progress) {
+//            builder.setContentTitle("Download Complete")
+//                .setContentText("AirDroid downloaded successfully")
+//                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+//                .setProgress(0, 0, false) // Remove progress indicator
+//        } else {
+//            builder.setContentTitle("Downloading AirDroid")
+//                .setContentText("Download in progress")
+//                .setSmallIcon(android.R.drawable.stat_sys_download)
+//                .setProgress(max, progress.toInt(), false)
+//        }
+//
+//        with(NotificationManagerCompat.from(context)) {
+//            if (ActivityCompat.checkSelfPermission(
+//                    context,
+//                    Manifest.permission.POST_NOTIFICATIONS
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                // TODO: Request the missing permissions
+//                return
+//            }
+//            notify(NOTIFICATION_ID, builder.build())
+//        }
+//    }
+    private fun showProgressNotification(context: Context, progress: Long, max: Int) {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+
         if (max.toLong() == progress) {
             builder.setContentTitle("Download Complete")
                 .setContentText("AirDroid downloaded successfully")
@@ -195,6 +236,5 @@ class ApkInstaller(private val context: Context) {
             notify(NOTIFICATION_ID, builder.build())
         }
     }
-
 }
 

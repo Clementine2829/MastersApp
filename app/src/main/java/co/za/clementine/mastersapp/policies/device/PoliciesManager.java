@@ -8,9 +8,13 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import co.za.clementine.mastersapp.DeviceOwnerReceiver;
+
 public abstract class PoliciesManager {
 
     protected  Context context;
+    protected DevicePolicyManager devicePolicyManager;
+    protected ComponentName componentName;
 
     public enum PasswordQuality {
         UNSPECIFIED("UNSPECIFIED"),
@@ -30,6 +34,12 @@ public abstract class PoliciesManager {
         public String getValue() {
             return value;
         }
+    }
+
+    public PoliciesManager(Context context) {
+        this.context = context;
+        this.devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        this.componentName = new ComponentName(context, DeviceOwnerReceiver.class);
     }
 
     public void verifyPasswordPolicies(DevicePolicyManager devicePolicyManager, ComponentName componentName) {

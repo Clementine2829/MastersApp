@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.system.exitProcess
 
 class StorageAccessPermission(private val activity: AppCompatActivity) {
 
@@ -20,8 +21,8 @@ class StorageAccessPermission(private val activity: AppCompatActivity) {
     private val manageStoragePermissionLauncher: ActivityResultLauncher<Intent> =
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (!isExternalStorageManager()) {
-//                Toast.makeText(activity, "Permission granted", Toast.LENGTH_SHORT).show()
-//            } else {
+                Toast.makeText(activity, "Permission granted", Toast.LENGTH_SHORT).show()
+            } else {
                 showPermissionDeniedDialog()
             }
         }
@@ -50,7 +51,8 @@ class StorageAccessPermission(private val activity: AppCompatActivity) {
         AlertDialog.Builder(activity)
             .setTitle("Storage Access Required")
             .setMessage("This app needs access to all files to function properly. Please grant the permission in the next screen.")
-            .setPositiveButton("Allow") { _, _ ->
+            .setPositiveButton("Allow") { dialog, _ ->
+                dialog.dismiss()
                 requestManageExternalStoragePermission()
             }
             .setNegativeButton("Deny") { dialog, _ ->
@@ -66,11 +68,13 @@ class StorageAccessPermission(private val activity: AppCompatActivity) {
         AlertDialog.Builder(activity)
             .setTitle("Permission Denied")
             .setMessage("Without the required permission, the app cannot function properly. Please grant the permission to continue using the app.")
-            .setPositiveButton("Try Again") { _, _ ->
+            .setPositiveButton("Try Again") { dialog, _ ->
+                dialog.dismiss()
                 showPermissionRequestDialog()
             }
             .setNegativeButton("Close App") { _, _ ->
                 activity.finish()
+                exitProcess(0)
             }
             .setCancelable(false)
             .show()

@@ -86,7 +86,10 @@ public class WifiSecurityChecker {
                 new AlertDialog.Builder(activity)
                         .setTitle("Permission Required")
                         .setMessage("Location permission is required to check Wi-Fi security. Please grant this permission to proceed.")
-                        .setPositiveButton("Try Again", (dialog, which) -> checkAndShowSecurityWarning())
+                        .setPositiveButton("Try Again", (dialog, which) -> {
+                            dialog.dismiss();
+                            checkAndShowSecurityWarning();
+                        })
                         .setNegativeButton("Exit", (dialog, which) -> {
                             activity.finish();
                             System.exit(0);

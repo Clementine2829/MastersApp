@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
+import co.za.clementine.mastersapp.profile.apps.install.AppInstallReceiver;
 
 public class ManageWorkProfileInstalledApps {
 
@@ -23,12 +24,10 @@ public class ManageWorkProfileInstalledApps {
     private final ComponentName adminComponent;
     private final Context context;
 
-    public ManageWorkProfileInstalledApps(Context context,
-                                          DevicePolicyManager devicePolicyManager,
-                                          ComponentName adminComponent) {
-        this.devicePolicyManager = devicePolicyManager;
-        this.adminComponent = adminComponent;
+    public ManageWorkProfileInstalledApps(Context context) {
         this.context = context;
+        this.devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        this.adminComponent = new ComponentName(context, DeviceOwnerReceiver.class);;
     }
 
     public List<String> getInstalledAppsInWorkProfile() {
@@ -70,10 +69,22 @@ public class ManageWorkProfileInstalledApps {
             if ((app.flags & ApplicationInfo.FLAG_INSTALLED) != 0) {
 //            if ((app.flags & ApplicationInfo.FLAG_INSTALLED) != 0 && (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0){
                 installedApps.add(app.packageName);
+                System.out.println("App: " + app);
             }
         }
-
         return installedApps;
+    }
+    public boolean isEndpointAirDroidInstalled() {
+        PackageManager packageManager = context.getPackageManager();
+        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        for (ApplicationInfo app : apps) {
+            if ((app.flags & ApplicationInfo.FLAG_INSTALLED) != 0) {
+//            if ((app.flags & ApplicationInfo.FLAG_INSTALLED) != 0 && (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0){
+                if(app.packageName.equals("com.sand.airdroidbiz")) return true;
+            }
+        }
+        return false;
     }
 
 
