@@ -40,4 +40,13 @@
         android:paddingTop="4dp"
         android:textColor="@android:color/black"/>
 
+    <TextView
+        android:id="@+id/time_remaining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Estimated time remaining: "
+        android:paddingTop="4dp"
+        android:visibility="invisible"
+        android:textColor="@android:color/black"/>
+
 </LinearLayout>

@@ -7,16 +7,34 @@ import android.content.Context;
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
 
 public class DevicePolicies extends PoliciesManager {
-    private DevicePolicyManager devicePolicyManager;
-    private ComponentName componentName;
+//    private final DevicePolicyManager devicePolicyManager;
+//    private final ComponentName componentName;
     private final int _passwordMinLength = 8;
     private final long _passwordExpirationTimeout = 2L * 60L * 1000L; // 5 minutes
     private final int _maxFailedPasswordsForWipe = 2;
     private final long timeoutMillis = 100000; // 100 seconds
     public DevicePolicies(Context context) {
-        this.devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        this.componentName = new ComponentName(context, DeviceOwnerReceiver.class);
+        super(context);
+//        this.devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+//        this.componentName = new ComponentName(context, DeviceOwnerReceiver.class);
         this.context = context;
+    }
+
+    public boolean isPasswordSet() {
+        if (devicePolicyManager.isAdminActive(componentName)) {
+            int passwordQuality = devicePolicyManager.getPasswordQuality(componentName);
+            return passwordQuality != DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
+        } else {
+//            showToast("Device Admin not active");
+            return false;
+        }
+    }
+
+    public boolean isDevicePasswordSetAccordingToPolicies() {
+        if (devicePolicyManager.isAdminActive(componentName)) {
+            return devicePolicyManager.isActivePasswordSufficient();
+        }
+        return false;
     }
 
     public boolean areSecurityPoliciesEnforced() {
@@ -26,20 +44,19 @@ public class DevicePolicies extends PoliciesManager {
             long passwordExpirationTimeout = devicePolicyManager.getPasswordExpirationTimeout(componentName);
             int maxFailedPasswordsForWipe = devicePolicyManager.getMaximumFailedPasswordsForWipe(componentName);
 
-            // Check if the password policies are enforced as desired
             boolean isComplexPasswordRequired = passwordQuality == DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX ||
                     passwordQuality == DevicePolicyManager.PASSWORD_QUALITY_COMPLEX;
             boolean isMinLengthEnforced = passwordMinLength >= _passwordMinLength;
             boolean isExpirationTimeoutSet = passwordExpirationTimeout == _passwordExpirationTimeout;
             boolean isMaxFailedPasswordsSet = maxFailedPasswordsForWipe == _maxFailedPasswordsForWipe;
 
-            return isComplexPasswordRequired && isMinLengthEnforced &&
+            return isPasswordSet() && isComplexPasswordRequired && isMinLengthEnforced &&
                     isExpirationTimeoutSet && isMaxFailedPasswordsSet;
         } else {
-            showToast("Device Admin not active");
             return false;
         }
     }
+
 
     public void setPasswordSecurityPolicies() {
         try {
