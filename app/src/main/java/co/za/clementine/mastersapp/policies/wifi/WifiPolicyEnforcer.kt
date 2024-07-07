@@ -4,8 +4,10 @@ import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 
-class WifiPolicyEnforcer(private val context: Context, private val wifiPolicyManager: WifiPolicyManager) {
-
+class WifiPolicyEnforcer(
+    private val context: Context,
+    private val wifiPolicyManager: WifiPolicyManager
+) {
     fun enforceSecureWifiPolicy() {
         if (!wifiPolicyManager.isCurrentNetworkSecure()) {
             AlertDialog.Builder(context)
@@ -15,9 +17,8 @@ class WifiPolicyEnforcer(private val context: Context, private val wifiPolicyMan
                     dialog.dismiss()
                 }
                 .show()
-
 //            wifiPolicyManager.suggestSecureNetwork("", "")
-        } else{
+        } else {
             Toast.makeText(context, "Wi-Fi is secured ", Toast.LENGTH_SHORT).show()
         }
     }

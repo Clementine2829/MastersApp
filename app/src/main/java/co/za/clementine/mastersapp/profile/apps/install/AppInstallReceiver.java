@@ -14,10 +14,6 @@ public class AppInstallReceiver extends BroadcastReceiver {
             if (new ManageWorkProfileInstalledApps(context).isEndpointAirDroidInstalled()) {
                 ProfilePolicies profilePolicies = new ProfilePolicies(context);
                 profilePolicies.setWorkProfileRestrictions();
-                System.out.println("Hello clementine...");
-            } else{
-                System.out.println("Hello clementine 2...");
-
             }
         }
     }

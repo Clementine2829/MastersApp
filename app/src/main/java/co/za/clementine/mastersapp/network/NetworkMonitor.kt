@@ -8,7 +8,8 @@ import android.net.NetworkRequest
 
 class NetworkMonitor(context: Context) {
 
-    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     var networkStateListener: NetworkStateListener? = null
 

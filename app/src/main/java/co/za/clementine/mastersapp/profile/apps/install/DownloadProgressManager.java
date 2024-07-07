@@ -51,12 +51,13 @@ public class DownloadProgressManager {
                 progressBar.setProgress(progress);
                 progressText.setText(progressPercentage);
                 progressSize.setText(String.format("%s / %s", downloadedSize, totalSize));
-                if(downloadedSize.equals(totalSize)) dialog.dismiss();
+                if (downloadedSize.equals(totalSize)) dialog.dismiss();
                 tvTimeRemaining.setText(String.format("Estimated remaining time: %s", formatTimeRemaining(timeRemaining)));
             });
         }
-        if(downloadedBytes == totalBytes) dismissProgressPopup();
+        if (downloadedBytes == totalBytes) dismissProgressPopup();
     }
+
     private String formatTimeRemaining(double seconds) {
         long hours = TimeUnit.SECONDS.toHours((long) seconds);
         long minutes = TimeUnit.SECONDS.toMinutes((long) seconds) % TimeUnit.HOURS.toMinutes(1);
@@ -70,8 +71,6 @@ public class DownloadProgressManager {
             return String.format("%d seconds", secs);
         }
     }
-
-
 
     public void dismissProgressPopup() {
         if (dialog != null && dialog.isShowing()) {

@@ -16,6 +16,11 @@ class PermissionManager(private val activity: Activity) {
     companion object {
         const val REQUEST_CODE_PERMISSIONS = 1
         const val REQUEST_CODE_WRITE_SETTINGS = 2
+        const val SECURITY_WPA3 = 3;
+        const val SECURITY_WPA2 = 2;
+        const val SECURITY_WPA = 1;
+        const val SECURITY_WEP = 0;
+        const val SECURITY_OPEN = -1;
     }
 
     fun requestNecessaryPermissions() {

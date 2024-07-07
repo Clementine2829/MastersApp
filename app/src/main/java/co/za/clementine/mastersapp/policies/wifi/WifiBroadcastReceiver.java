@@ -1,5 +1,9 @@
 package co.za.clementine.mastersapp.policies.wifi;
 
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WPA;
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WPA2;
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WPA3;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +17,7 @@ import android.widget.Toast;
 public class WifiBroadcastReceiver extends BroadcastReceiver {
 
     private final Context context;
+
 
     public WifiBroadcastReceiver(Context context) {
         this.context = context;
@@ -53,12 +58,6 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
         }
 //        int securityType = wifiInfo.getCurrentSecurityType();
 //        return securityType == WifiInfo.SECURITY_TYPE_WPA2_PSK || securityType == WifiInfo.SECURITY_TYPE_WPA3_SAE;
-
-        int SECURITY_WPA3 = 3;
-        int SECURITY_WPA2 = 2;
-        int SECURITY_WPA = 1;
-//        int SECURITY_WEP = 0;
-//        int SECURITY_OPEN = -1;
         return securityType == SECURITY_WPA || securityType == SECURITY_WPA2 || securityType == SECURITY_WPA3;
     }
 }

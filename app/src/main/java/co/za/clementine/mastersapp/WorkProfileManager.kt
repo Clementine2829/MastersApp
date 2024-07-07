@@ -18,7 +18,8 @@ import kotlinx.coroutines.delay
 class WorkProfileManager(
     private val context: Context,
     private val dpm: DevicePolicyManager,
-    private val adminComponent: ComponentName) {
+    private val adminComponent: ComponentName
+) {
 
     fun workProfileExist(): Boolean {
         try {
@@ -42,7 +43,7 @@ class WorkProfileManager(
 
     fun createWorkProfile() {
         try {
-            if(!isMultipleUsersEnabled(context)){
+            if (!isMultipleUsersEnabled(context)) {
                 showEnableMultipleUsersDialog()
                 throw MyCustomException(/*"security policy exception"*/)
             }
@@ -53,8 +54,10 @@ class WorkProfileManager(
 //                                DevicePolicyManager.MAKE_USER_EPHEMERAL or
 //                                DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED
                     // Create a work profile
-                    val workProfile = dpm.createAndManageUser(adminComponent, "Work Profile", adminComponent,
-                        null,0 /*DevicePolicyManager.MAKE_USER_EPHEMERAL*/)
+                    val workProfile = dpm.createAndManageUser(
+                        adminComponent, "Work Profile", adminComponent,
+                        null, 0 /*DevicePolicyManager.MAKE_USER_EPHEMERAL*/
+                    )
 //                        null, flags)
 
                     if (workProfile != null) {
@@ -76,16 +79,6 @@ class WorkProfileManager(
         }
     }
 
-
-//    fun isMultipleUsersEnabled(context: Context): Boolean {
-//        return try {
-//            val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled")
-//            pref == 1 && UserManager.supportsMultipleUsers()
-//        } catch (e: Settings.SettingNotFoundException) {
-//            println("user_switcher_enabled setting not found: ${e.message}")
-//            throw MyCustomException(/*"security policy exception"*/)
-//        }
-//    }
     fun isMultipleUsersEnabled(context: Context): Boolean {
         return try {
             val pref = Settings.Global.getInt(context.contentResolver, "user_switcher_enabled", 0)
@@ -99,9 +92,11 @@ class WorkProfileManager(
     fun showEnableMultipleUsersDialog() {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Enable Multiple Users")
-        builder.setMessage("To use this feature, you need to enable the 'Multiple users' setting on your device. " +
-                "Please follow these steps:\n\n1. Open Settings.\n2. Navigate to System settings.\n3. " +
-                "Access Additional settings.\n4. Enable Multiple users.")
+        builder.setMessage(
+            "To use this feature, you need to enable the 'Multiple users' setting on your device. " +
+                    "Please follow these steps:\n\n1. Open Settings.\n2. Navigate to System settings.\n3. " +
+                    "Access Additional settings.\n4. Enable Multiple users."
+        )
         builder.setPositiveButton("Open Settings") { _, _ ->
             val intent = Intent(Settings.ACTION_SETTINGS)
             context.startActivity(intent)
@@ -131,57 +126,7 @@ class WorkProfileManager(
         }
     }
 
-    private fun makeToast(message: String){
+    private fun makeToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
-
-
-    public fun lockProfile() {
-//        if (dpm.isProfileOwnerApp("co.za.clementine.mastersapp")) {
-//            dpm.lockNow()
-//        }
-//        if (dpm.isProfileOwnerApp("co.za.clementine.mastersapp")) {
-//            dpm.setPasswordQuality(adminComponent, DevicePolicyManager.PASSWORD_QUALITY_COMPLEX)
-//            dpm.setPasswordMinimumLength(adminComponent, 8)
-//            showToast(context, "Locked with password")
-//        }
-
-
-
-        // Create or retrieve the MasterKey
-        val masterKeyAlias = MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
-            .setKeyGenParameterSpec(
-                KeyGenParameterSpec.Builder(
-                    MasterKey.DEFAULT_MASTER_KEY_ALIAS,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                )
-                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
-                    .build()
-            )
-            .build()
-
-// Create an EncryptedSharedPreferences instance
-        val sharedPreferences = EncryptedSharedPreferences.create(
-            context,
-            "my_secret_prefs",
-            masterKeyAlias,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-
-// Save a password
-        sharedPreferences.edit()
-            .putString("password", "my_password")
-            .apply()
-
-// Retrieve the password
-        val password = sharedPreferences.getString("password", "")
-
-
-
-    }
-
-
 }
