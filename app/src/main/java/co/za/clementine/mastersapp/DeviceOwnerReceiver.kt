@@ -12,7 +12,8 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
 
     override fun onProfileProvisioningComplete(context: Context, intent: Intent) {
         val manager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        val componentName = ComponentName(context.applicationContext, DeviceOwnerReceiver::class.java)
+        val componentName =
+            ComponentName(context.applicationContext, DeviceOwnerReceiver::class.java)
 
         manager.setProfileName(componentName, context.getString(R.string.profile_name_clementine))
         manager.setProfileEnabled(componentName)
@@ -53,8 +54,11 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
         val adminComponent = ComponentName(context, DeviceOwnerReceiver::class.java)
 
         // Display a custom lock screen message
-        dpm.setOrganizationName(adminComponent, "Masters App")
-        dpm.setDeviceOwnerLockScreenInfo(adminComponent, "This device is managed by Masters App. Contact IT for assistance.")
+        dpm.setOrganizationName(adminComponent, "ShildDroid Enterprise")
+        dpm.setDeviceOwnerLockScreenInfo(
+            adminComponent,
+            "This device is managed by Masters App. Contact IT for assistance."
+        )
 
         disableCamera(dpm, adminComponent)
 
@@ -76,7 +80,11 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
 
     private fun startActivityAsUser(context: Context, intent: Intent, userHandle: UserHandle) {
         try {
-            val method = Context::class.java.getMethod("startActivityAsUser", Intent::class.java, UserHandle::class.java)
+            val method = Context::class.java.getMethod(
+                "startActivityAsUser",
+                Intent::class.java,
+                UserHandle::class.java
+            )
             method.invoke(context, intent, userHandle)
         } catch (e: Exception) {
             e.printStackTrace()

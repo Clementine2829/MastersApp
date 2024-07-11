@@ -1,5 +1,11 @@
 package co.za.clementine.mastersapp.policies.wifi;
 
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_OPEN;
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WEP;
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WPA;
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WPA2;
+import static co.za.clementine.mastersapp.policies.wifi.PermissionManager.SECURITY_WPA3;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -62,12 +68,6 @@ public class WifiPolicyManager {
             return SECURITY_OPEN;
         }
     }
-
-    private static final int SECURITY_WPA3 = 3;
-    private static final int SECURITY_WPA2 = 2;
-    private static final int SECURITY_WPA = 1;
-    private static final int SECURITY_WEP = 0;
-    private static final int SECURITY_OPEN = -1;
 
     public void suggestSecureNetwork(String ssid, String password) {
         WifiNetworkSpecifier wifiNetworkSpecifier = new WifiNetworkSpecifier.Builder()

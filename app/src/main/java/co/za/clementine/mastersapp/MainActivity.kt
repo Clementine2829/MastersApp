@@ -17,12 +17,17 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import co.za.clementine.mastersapp.Utils.Companion.confirmPopUpAction
+import co.za.clementine.mastersapp.Utils.Companion.goToAboutUsActivity
+import co.za.clementine.mastersapp.Utils.Companion.goToMainActivity
+import co.za.clementine.mastersapp.Utils.Companion.goToMoreInfoActivity
 import co.za.clementine.mastersapp.enrollment.process.Task
 import co.za.clementine.mastersapp.enrollment.process.TaskAdapter
 import co.za.clementine.mastersapp.exceptions.MyCustomException
@@ -31,6 +36,7 @@ import co.za.clementine.mastersapp.permissions.PermissionDialogManager
 import co.za.clementine.mastersapp.permissions.StorageAccessPermission
 import co.za.clementine.mastersapp.policies.bluetooth.BluetoothController
 import co.za.clementine.mastersapp.policies.device.DevicePolicies
+import co.za.clementine.mastersapp.policies.device.PoliciesManager.removeDeviceAdmin
 import co.za.clementine.mastersapp.policies.device.PoliciesManager.showPolicyDialog
 import co.za.clementine.mastersapp.policies.device.ProfilePolicies
 import co.za.clementine.mastersapp.policies.wifi.PermissionManager
@@ -43,10 +49,11 @@ import co.za.clementine.mastersapp.profile.apps.install.AppInstallReceiver
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Thread.sleep
 import kotlin.system.exitProcess
 
 
-class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
+class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
 
     private lateinit var devicePolicyManager: DevicePolicyManager
     private lateinit var adminComponentName: ComponentName
@@ -65,12 +72,13 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
     private lateinit var adapter: TaskAdapter
 
+
     private val tasks = mutableListOf<Task>()
 
     private lateinit var btnUndoAdmin: Button
     private lateinit var btnWorkProfile: Button
 
-    private val delayTime:Long = 2000
+    private val delayTime: Long = 2000
 
     private lateinit var permissionDialogManager: PermissionDialogManager
     private lateinit var storageAccessPermission: StorageAccessPermission
@@ -91,6 +99,10 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_2)
 
+        val toolbar:Toolbar = findViewById(R.id.mainMenuToolBar);
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = ""
+
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         adminComponentName = ComponentName(this, DeviceOwnerReceiver::class.java)
 
@@ -106,6 +118,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
         wifiPolicyManager = WifiPolicyManager(this)
         permissionManager = PermissionManager(this)
+        permissionManager.requestNecessaryPermissions()
         wifiPolicyEnforcer = WifiPolicyEnforcer(this, wifiPolicyManager)
         wifiBroadcastReceiver = WifiBroadcastReceiver(this)
 
@@ -121,7 +134,10 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = TaskAdapter(tasks, { position -> retryTask(position) }, { position -> undoTask(position) })
+        adapter = TaskAdapter(
+            tasks,
+            { position -> retryTask(position) },
+            { position -> undoTask(position) })
         recyclerView.adapter = adapter
 
         if (devicePolicyManager.isDeviceOwnerApp(packageName)) {
@@ -132,8 +148,10 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
             setupAdminTasks()
         } else if (devicePolicyManager.isProfileOwnerApp(packageName)) {
             setupWorkProfileTasks()
+//            checkStatusOfAirDroidInstallation()
         } else {
             setupWorkProfileTasks()
+//            checkStatusOfAirDroidInstallation()
         }
         startTasks()
         val filter = IntentFilter()
@@ -154,10 +172,11 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val message = "Are you sure you want to exit? This action will close the app."
-                confirmPopUpAction("Exit App", message, { exitProcess(0) }, { })
+                confirmPopUpAction(this@MainActivity, "Exit App", message, { exitProcess(0) }, { })
             }
         })
     }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
@@ -169,126 +188,111 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                 gotToAboutUs()
                 true
             }
+
             R.id.terms_and_conditions -> {
                 gotToTermsAndConditions()
                 true
             }
+
             R.id.refresh -> {
                 relaunchMain()
                 true
             }
+
             R.id.quit -> {
                 val message = "Are you sure you want to quit? App will be closed."
                 confirmAppExit(message)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun gotToAboutUs(){
-        startActivity(Intent(this, AboutUs::class.java))
+    private fun gotToAboutUs() {
+        goToAboutUsActivity(this)
     }
-    private fun gotToTermsAndConditions(){
-        startActivity(Intent(this, MoreInfoActivity::class.java))
+
+    private fun gotToTermsAndConditions() {
+        goToMoreInfoActivity(this, "")
     }
-    private fun relaunchMain(){
-        startActivity(Intent(this, MainActivity::class.java))
+
+    private fun relaunchMain() {
+        goToMainActivity(this)
         finishAffinity()
     }
-    private fun confirmAppExit(message: String){
+
+    private fun confirmAppExit(message: String) {
         val foo: () -> Unit = { enableAdmin2() }
-        confirmPopUpAction("Exit App", message, { exitProcess(0) }, foo)
-    }
-    private fun confirmPopUpAction(title: String, message: String, foo1: () -> Unit, foo2: () -> Unit){
-        AlertDialog.Builder(this)
-        .setTitle(title)
-        .setMessage(message)
-        .setPositiveButton("YES") { _, _ ->
-            foo1()
-        }
-        .setNeutralButton("NO") { dialog, _ ->
-            dialog.dismiss()
-            foo2()
-        }
-        .setCancelable(false)
-        .create()
-        .show()
+        confirmPopUpAction(this, "Exit App", message, { exitProcess(0) }, foo)
     }
 
     private fun setupAdminTasks() {
         val devicePolicies = DevicePolicies(this)
         val workProfileManager = WorkProfileManager(this, devicePolicyManager, adminComponentName)
-
-//        devicePolicies.areSecurityPoliciesEnforced()
-//        showPolicyDialog(this)
         tasks.addAll(
             listOf(
                 Task(
                     name = "Enable Admin",
                     status = if (isAdminEnabled()) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = ::enableAdmin,
-                    undoAction = ::disableAdmin),
-//                Task(
-//                    name = "Lock Task Mode Enter",
-//                    status = TaskEnum.PENDING,
-//                    action = ::lockTaskModeEnter,
-//                    undoAction = ::foo),
-//                Task("Lock Device", TaskEnum.PENDING, action = ::lockDevice, undoAction = ::unlockDevice),
-//                Task(name = "Set Device Policy", status = TaskEnum.PENDING, action = ::DevicePolicies(), undoAction = ::removeDevicePolicy),
-
-//                Task(name = "Enforce Wi-Fi Policies",
-//                    status = TaskEnum.PENDING,
-//                    action = ::enforceWiFiPolicies,
-//                    undoAction = ::removeWiFiPolicies),
-//                Task(name = "Enforce Bluetooth policies",
-//                    status = TaskEnum.PENDING,
-//                    action = ::disableBluetoothDiscoverability,
-//                    undoAction = ::enableBluetoothDiscoverability),
+                    undoAction = ::disableAdmin
+                ),
+                Task(
+                    name = "Lock Task Mode Enter",
+                    status = TaskEnum.PENDING,
+                    action = ::lockTaskModeEnter,
+                    undoAction = ::foo
+                ),
                 Task(
                     name = "Enforce Password policies",
                     status = if (devicePolicies.areSecurityPoliciesEnforced()) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
                         devicePolicies.setPasswordSecurityPolicies()
                     },
-                    undoAction = ::foo),
+                    undoAction = ::foo
+                ),
                 Task(
                     name = "Enforce Storage Encryption policies",
                     status = if (devicePolicies.isStorageEncryptionEnforced()) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
                         devicePolicies.enforceStorageEncryption()
                     },
-                    undoAction = ::foo),
+                    undoAction = ::foo
+                ),
                 Task(
                     name = "Enforce Screen Timeout policies",
                     status = if (devicePolicies.isScreenTimeoutEnforced) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
                         devicePolicies.setScreenTimeoutPolicy()
                     },
-                    undoAction = ::foo),
+                    undoAction = ::foo
+                ),
                 Task(
                     name = "Verify device policies",
                     status = if (devicePolicies.areSecurityPoliciesEnforced()) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
-                        devicePolicies.verifyPasswordPolicies(devicePolicyManager, adminComponentName)
+                        devicePolicies.verifyPasswordPolicies(
+                            devicePolicyManager,
+                            adminComponentName
+                        )
                     },
-                    undoAction = ::foo),
-//                Task(name = "Enforce Network policies",
-//                    status = TaskEnum.PENDING,
-//                    action = {
-//                        val devicePolicies = DevicePolicies(context)
-//                        devicePolicies.setPasswordSecurityPolicies()
-//                    }, undoAction = ::foo),
-                Task(name = "Create work profile",
+                    undoAction = ::foo
+                ),
+                Task(
+                    name = "Create work profile",
                     status = if (workProfileManager.workProfileExist()) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
-                        if(devicePolicies.isDevicePasswordSetAccordingToPolicies() &&
+                        if (
+                            devicePolicies.isPasswordSet &&
+                            devicePolicies.isDevicePasswordSetAccordingToPolicies() &&
                             devicePolicies.isStorageEncryptionEnforced() &&
-                            devicePolicies.isScreenTimeoutEnforced){
-                            if(workProfileManager.isMultipleUsersEnabled(this)){
+                            devicePolicies.isScreenTimeoutEnforced
+                        ) {
+                            if (workProfileManager.isMultipleUsersEnabled(this)) {
                                 workProfileManager.createWorkProfile()
                                 btnWorkProfile.visibility = View.VISIBLE
-                            } else{
+                            } else {
                                 workProfileManager.showEnableMultipleUsersDialog()
                                 println("isMultipleUsersEnabled? Not enabled")
                                 throw MyCustomException(/*"security policy exception"*/)
@@ -298,40 +302,25 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                             throw MyCustomException(/*"security policy exception"*/)
                         }
                     },
-                    undoAction = ::foo),
-//                Task(name = "Switch to work profile",
-//                    status = if (workProfileManager.workProfileExist()) TaskEnum.COMPLETED else TaskEnum.PENDING,
-//                    action = {
-//                        if(devicePolicies.areSecurityPoliciesEnforced()){
-//                            if(workProfileManager.isMultipleUsersEnabled(this)){
-//                                val profileSelectionDialog = ProfileSelectionDialog(this, devicePolicyManager, adminComponentName)
-//                                profileSelectionDialog.showAndSwitchToWorkProfile()
-//                            } else{
-////                                workProfileManager.showEnableMultipleUsersDialog()
-//                                throw MyCustomException(/*"security policy exception"*/)
-//                            }
-//                        } else {
-//                            showPolicyDialog(this)
-//                            throw MyCustomException(/*"security policy exception"*/)
-//                        }
-//                    },
-//                    undoAction = ::foo),
-//                Task(
-//                    name = "Exit Lock Task Mode",
-//                    status = TaskEnum.PENDING,
-//                    action = ::lockTaskModeExit,
-//                    undoAction = ::foo)
+                    undoAction = ::foo
+                ),
+                Task(
+                    name = "Exit Lock Task Mode Enter",
+                    status = TaskEnum.PENDING,
+                    action = ::lockTaskModeExit,
+                    undoAction = ::foo
+                ),
             )
         )
 
-        if (isAdminEnabled()){
+        if (isAdminEnabled()) {
             btnUndoAdmin.visibility = View.VISIBLE
-        } else{
+        } else {
             btnUndoAdmin.visibility = View.GONE
         }
-        if (workProfileManager.workProfileExist()){
+        if (workProfileManager.workProfileExist()) {
             btnWorkProfile.visibility = View.VISIBLE
-        } else{
+        } else {
             btnWorkProfile.visibility = View.GONE
         }
     }
@@ -341,32 +330,40 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         val apkInstaller = ApkInstaller(this)
         tasks.addAll(
             listOf(
-               Task(name = "Download AirDroid App",
-                    status = if (apkInstaller.fileExistsInDownloadDirectory(fileName))  TaskEnum.COMPLETED else TaskEnum.PENDING,
+                Task(
+                    name = "Download AirDroid App",
+                    status = if (apkInstaller.fileExistsInDownloadDirectory(fileName)) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
 //                        val apkUrl = "https://dl.airdroid.com/$fileName"
 //                        val apkUrl = "https://airdroid.at/557530"
-                        val apkUrl = "https://s3.amazonaws.com/airtransfera/AirDroid_Business_Daemon_1.4.1.0_58705885_110298_sandstudio.apk"
+                        val apkUrl =
+                            "https://s3.amazonaws.com/airtransfera/AirDroid_Business_Daemon_1.4.1.0_58705885_110298_sandstudio.apk"
                         apkInstaller.downloadAndInstall(apkUrl, packageManager)
                     },
-                    undoAction = ::foo),
-                Task(name = "Install AirDroid App",
-                    status = if(ManageWorkProfileInstalledApps(this).isEndpointAirDroidInstalled()) TaskEnum.COMPLETED else TaskEnum.PENDING,
+                    undoAction = ::foo
+                ),
+                Task(
+                    name = "Install AirDroid App",
+                    status = if (ManageWorkProfileInstalledApps(this).isEndpointAirDroidInstalled()) TaskEnum.COMPLETED else TaskEnum.PENDING,
                     action = {
                         apkInstaller.installApk(apkInstaller.getAirDroidInDownloads())
                     },
-                    undoAction = ::foo),
+                    undoAction = ::foo
+                ),
                 Task(name = "Enforce Work Profile Restrictions",
                     status = TaskEnum.PENDING,
                     action = {
-                             TaskEnum.FAILED
 //                        ProfilePolicies(this).setWorkProfileRestrictions()
                         throw MyCustomException()
-                    }, undoAction = ::foo),
-                )
+                    }, undoAction = {
+                        ProfilePolicies(this).setWorkProfileRestrictions()
+                        throw MyCustomException()
+                    }),
+            )
         )
     }
-    private fun foo(){}
+
+    private fun foo() {}
 
 
     private fun startTasks() {
@@ -376,27 +373,11 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
             }
         }
     }
-//    private fun startWorkProfileTasks() {
-//        lifecycleScope.launch {
-//            for (i in tasks.indices) {
-//                executeTask(i)
-//            }
-//        }
-//    }
+
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(wifiBroadcastReceiver)
     }
-
-
-//    @Deprecated("Deprecated in Java")
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//
-//        val message = "Are you sure you want to exit? This action will close the app."
-//        confirmPopUpAction("Exit App", message, { exitProcess(0) }, { })
-//    }
-
 
     private fun retryTask(position: Int) {
         lifecycleScope.launch {
@@ -432,7 +413,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         if (success) {
             tasks[position].status = TaskEnum.COMPLETED
             tasks[position].undoVisible = false
-            if(position == 0 && devicePolicyManager.isDeviceOwnerApp(packageName)) {
+            if (position == 0 && devicePolicyManager.isDeviceOwnerApp(packageName)) {
                 tasks[position].undoVisible = true // this one is the enable admin thing
             }
         } else {
@@ -441,6 +422,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         }
         adapter.notifyItemChanged(position)
     }
+
     private suspend fun executeUndoTask(position: Int) {
         tasks[position].status = TaskEnum.UNDOING
         tasks[position].undoVisible = false
@@ -462,10 +444,18 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         }
         adapter.notifyItemChanged(position)
     }
+    private fun checkStatusOfAirDroidInstallation(){
+        while (true) {
+            sleep(500)
+            if (ManageWorkProfileInstalledApps(this).isEndpointAirDroidInstalled) {
+                tasks.last().status = TaskEnum.COMPLETED
+                break
+            }
+        }
+    }
 
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {
         var doMessage = "App's device owner state is unknown"
-
         if (savedInstanceState == null) {
             doMessage = if (devicePolicyManager.isDeviceOwnerApp(applicationContext.packageName)) {
                 "App is device owner"
@@ -473,65 +463,74 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
                 "App is not device owner"
             }
         }
-
         Log.e(TAG, doMessage)
         Toast.makeText(this, doMessage, Toast.LENGTH_SHORT).show()
-
     }
+
     private suspend fun enableAdmin() {
         delay(delayTime)
         enableAdmin2()
     }
+
     private fun enableAdmin2() {
         if (!devicePolicyManager.isAdminActive(adminComponentName)) {
             AlertDialog.Builder(this)
-            .setTitle("Enrollment process")
-            .setMessage("The device will start with the enrollment process. Please allow the app to be an admin.\nCancel to stop and close the app.")
-            .setPositiveButton("OK") { _, _ ->
-                val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponentName)
-                startActivity(intent)
-            }
-            .setNeutralButton("Cancel") { _, _ ->
-                val message = "Are you sure you want to exit? Canceling will close the app."
-                confirmAppExit(message)
-            }
-            .create()
-            .show()
+                .setTitle("Enrollment process")
+                .setMessage("The device will start with the enrollment process. Please allow the app to be an admin.\nCancel to stop and close the app.")
+                .setPositiveButton("OK") { _, _ ->
+                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                    intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponentName)
+                    startActivity(intent)
+                }
+                .setNeutralButton("Cancel") { _, _ ->
+                    val message = "Are you sure you want to exit? Canceling will close the app."
+                    confirmAppExit(message)
+                }
+                .create()
+                .show()
         } else {
             println("Admin enabled already")
         }
     }
 
-    private fun switchToWorkProfile(){
+    private fun switchToWorkProfile() {
         val devicePolicies = DevicePolicies(this)
-        if(devicePolicies.isDevicePasswordSetAccordingToPolicies() &&
+        if (
+            devicePolicies.isPasswordSet &&
+            devicePolicies.isDevicePasswordSetAccordingToPolicies() &&
             devicePolicies.isStorageEncryptionEnforced() &&
-            devicePolicies.isScreenTimeoutEnforced){
+            devicePolicies.isScreenTimeoutEnforced
+        ) {
             val message = "Do you want to switch to work profile?"
             confirmPopUpAction(
+                this,
                 "Work Profile",
                 message,
                 {
                     findViewById<Button>(R.id.btnWorkProfile).visibility = View.VISIBLE
-                    ProfileSelectionDialog(this, devicePolicyManager, adminComponentName).switchToProfile()
+                    ProfileSelectionDialog(
+                        this,
+                        devicePolicyManager,
+                        adminComponentName
+                    ).switchToProfile()
                 },
                 {}
             )
         } else {
             showPolicyDialog(this)
-            throw MyCustomException(/*"security policy exception"*/)
+//            throw MyCustomException(/*"security policy exception"*/)
         }
     }
+
     private fun btnDisableAdmin() {
         val message = "Are you sure you want to disable admin privileges?"
-        confirmPopUpAction("Disable Admin", message, { disableAdmin() }, {  })
-    }
-    private fun disableAdmin() {
-        devicePolicyManager.removeActiveAdmin(adminComponentName)
-        println("is admin active " + devicePolicyManager.isAdminActive(adminComponentName))
+        confirmPopUpAction(this, "Disable Admin", message, { disableAdmin() }, { })
     }
 
+    private fun disableAdmin() {
+        removeDeviceAdmin(devicePolicyManager, adminComponentName)
+        devicePolicyManager.removeActiveAdmin(adminComponentName)
+    }
 
 
     private fun isAdminEnabled(): Boolean {
@@ -543,14 +542,10 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         devicePolicyManager.setLockTaskPackages(adminComponentName, arrayOf(packageName))
         startLockTask()
     }
+
     private fun lockTaskModeExit() {
         stopLockTask()
     }
-
-
-//    private fun getAdminInstalledApps(): List<String> {
-//        return manageWorkProfileInstalledApps.getInstalledAppsForAdmin()
-//    }
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -569,7 +564,11 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionManager.handlePermissionsResult(requestCode, grantResults) {
             wifiPolicyEnforcer.enforceSecureWifiPolicy()
@@ -584,7 +583,8 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
             }
         }
     }
-     private fun enableProfileOwner() {
+
+    private fun enableProfileOwner() {
         if (!devicePolicyManager.isDeviceOwnerApp(packageName)) {
             Toast.makeText(this, "App is not the device owner", Toast.LENGTH_SHORT).show()
             return
@@ -619,13 +619,12 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener  {
         super.onPause()
         networkMonitor.unregisterNetworkCallback()
     }
+
     override fun onNetworkAvailable() {
         Toast.makeText(this, "Network is available", Toast.LENGTH_SHORT).show()
-        // Proceed with the download or any network-dependent operations
     }
 
     override fun onNetworkLost() {
-//        Toast.makeText(this, "Network connection lost", Toast.LENGTH_SHORT).show()
         AlertDialog.Builder(this)
             .setTitle("Network lost warning")
             .setMessage("Network connection lost. Please reconnect")

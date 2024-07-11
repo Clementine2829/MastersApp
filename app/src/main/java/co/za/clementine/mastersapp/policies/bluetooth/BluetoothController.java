@@ -30,7 +30,7 @@ public class BluetoothController {
                     }
                     // BluetoothAdapter doesn't have setScanMode method directly available.
                     // We need to handle discoverability through intents and broadcasts if required.
-                    // This can be more complex, but for simplicity, we'll assume Bluetooth is made non-discoverable through settings.
+                    // This can be more complex, but for simplicity, we'll assume Bluetooth is made non-discoverable through settings or via MDM.
                 } catch (SecurityException e) {
                     e.printStackTrace();
                 }

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="@dimen/padding_xx_large">
 
 
     <TextView
@@ -12,13 +12,17 @@
         android:layout_height="wrap_content"
         android:text="@string/app_version_1_0_0"
         android:textColor="@color/black"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_normal"
         android:gravity="center" />
     <ImageView
         android:id="@+id/appIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/padding_xxx_large"
+        android:paddingEnd="@dimen/padding_xxx_large"
+        android:layout_marginStart="@dimen/margin_xx_large"
+        android:layout_marginEnd="@dimen/margin_xx_large"
         android:layout_gravity="center"
         android:src="@drawable/ic_launcher_background"
     android:contentDescription="@string/app_icon_description"/>
@@ -27,7 +31,7 @@
         android:id="@+id/disclaimerText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:text="@string/disclaimer_text"
         android:textSize="16sp"/>
 
@@ -35,7 +39,7 @@
         android:id="@+id/btnAgree"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:text="@string/agree"/>
 
     <Button
@@ -49,7 +53,7 @@
         android:id="@+id/btnMoreInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:text="@string/more_info"
         android:textColor="@android:color/holo_blue_light"
         android:textSize="14sp"

@@ -1,11 +1,7 @@
 package co.za.clementine.mastersapp.policies.device;
 
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.UserManager;
-
-import co.za.clementine.mastersapp.DeviceOwnerReceiver;
 
 public class ProfilePolicies extends PoliciesManager{
     public ProfilePolicies(Context context) {
@@ -36,6 +32,7 @@ public class ProfilePolicies extends PoliciesManager{
     //            devicePolicyManager.addUserRestriction(compName, UserManager.DISALLOW_SAFE_BOOT);
 
                 showToast("Work profile restrictions set");
+
             } else {
                 showToast("Not a profile owner");
             }

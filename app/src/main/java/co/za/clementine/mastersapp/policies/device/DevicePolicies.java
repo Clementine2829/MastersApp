@@ -7,16 +7,13 @@ import android.content.Context;
 import co.za.clementine.mastersapp.DeviceOwnerReceiver;
 
 public class DevicePolicies extends PoliciesManager {
-//    private final DevicePolicyManager devicePolicyManager;
-//    private final ComponentName componentName;
     private final int _passwordMinLength = 8;
     private final long _passwordExpirationTimeout = 2L * 60L * 1000L; // 5 minutes
     private final int _maxFailedPasswordsForWipe = 2;
     private final long timeoutMillis = 100000; // 100 seconds
+
     public DevicePolicies(Context context) {
         super(context);
-//        this.devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-//        this.componentName = new ComponentName(context, DeviceOwnerReceiver.class);
         this.context = context;
     }
 
@@ -25,7 +22,6 @@ public class DevicePolicies extends PoliciesManager {
             int passwordQuality = devicePolicyManager.getPasswordQuality(componentName);
             return passwordQuality != DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
         } else {
-//            showToast("Device Admin not active");
             return false;
         }
     }
@@ -67,7 +63,7 @@ public class DevicePolicies extends PoliciesManager {
                     devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_COMPLEX);
                     devicePolicyManager.setPasswordMinimumLength(componentName, _passwordMinLength);
                     // Set password expiration timeout to 3 months (90 days)
-    //                devicePolicyManager.setPasswordExpirationTimeout(componentName, 90L * 24L * 60L * 60L * 1000L);  // 90 days
+                    //                devicePolicyManager.setPasswordExpirationTimeout(componentName, 90L * 24L * 60L * 60L * 1000L);  // 90 days
                     devicePolicyManager.setPasswordExpirationTimeout(componentName, _passwordExpirationTimeout);
                     devicePolicyManager.setMaximumFailedPasswordsForWipe(componentName, _maxFailedPasswordsForWipe);
                     showToast("High security policies set");
@@ -81,6 +77,7 @@ public class DevicePolicies extends PoliciesManager {
             e.printStackTrace();
         }
     }
+
     public boolean isStorageEncryptionEnforced() {
         int encryptionStatus = devicePolicyManager.getStorageEncryptionStatus();
         return encryptionStatus == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER;
@@ -103,6 +100,7 @@ public class DevicePolicies extends PoliciesManager {
             e.printStackTrace();
         }
     }
+
     public boolean isScreenTimeoutEnforced() {
         if (devicePolicyManager.isAdminActive(componentName)) {
             long currentTimeoutMillis = devicePolicyManager.getMaximumTimeToLock(componentName);
@@ -112,6 +110,7 @@ public class DevicePolicies extends PoliciesManager {
             return false;
         }
     }
+
     public void setScreenTimeoutPolicy() {
         try {
             Thread.sleep(2000);
@@ -125,7 +124,6 @@ public class DevicePolicies extends PoliciesManager {
             e.printStackTrace();
         }
     }
-
 }
 
 

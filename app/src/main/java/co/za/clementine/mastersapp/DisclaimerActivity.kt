@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
+import co.za.clementine.mastersapp.Utils.Companion.goToMainActivity
+import co.za.clementine.mastersapp.Utils.Companion.goToMoreInfoActivity
 import co.za.clementine.mastersapp.security.AppSecurityManager
 import kotlin.system.exitProcess
 
@@ -32,24 +34,17 @@ class DisclaimerActivity : AppCompatActivity() {
             securityManager!!.requestAuthentication(this);
         }
 
-        appIcon.setImageResource(R.drawable.ic_launcher_background)  // Replace with your app icon resource
+        appIcon.setImageResource(R.drawable.logo)
         disclaimerText.text = getString(R.string.disclaimer_text)
 
         btnAgree.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            goToMainActivity(this)
         }
-
         btnCancel.setOnClickListener {
             showExitConfirmationDialog("Are you sure you want to exit? Canceling will close the app.")
         }
-
-
         btnMoreInfo.setOnClickListener {
-            // Open a web page or activity with more information about T&Cs and Privacy Policy
-            val intent = Intent(this, MoreInfoActivity::class.java)
-            startActivity(intent)
+            goToMoreInfoActivity(this, "disclaimer")
         }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -57,15 +52,11 @@ class DisclaimerActivity : AppCompatActivity() {
             }
         })
     }
-    override fun onResume() {
-        super.onResume()
-        if (!securityManager!!.isUserAuthenticated) {
-            securityManager!!.requestAuthentication(this)
-        }
-    }
-    @Deprecated("Deprecated in Java", ReplaceWith(
-        "super.onActivityResult(requestCode, resultCode, data)",
-        "androidx.appcompat.app.AppCompatActivity"
+
+    @Deprecated(
+        "Deprecated in Java", ReplaceWith(
+            "super.onActivityResult(requestCode, resultCode, data)",
+            "androidx.appcompat.app.AppCompatActivity"
         )
     )
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -76,8 +67,10 @@ class DisclaimerActivity : AppCompatActivity() {
             finish() // or take other appropriate action
         }
     }
+
     private fun showExitConfirmationDialog(msg: String) {
-        val message = msg.ifEmpty { "Are you sure you want to exit? This action will close the app." }
+        val message =
+            msg.ifEmpty { "Are you sure you want to exit? This action will close the app." }
         AlertDialog.Builder(this).apply {
             setTitle("Exit App")
             setMessage(message)

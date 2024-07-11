@@ -74,13 +74,7 @@ public abstract class PoliciesManager {
         showToast("Password Quality: " + passwordQualityEnum);
         showToast("Max Failed Passwords for Wipe: " + maxFailedPasswordsForWipe);
     }
-    public static void removeDeviceAdmin(DevicePolicyManager devicePolicyManager, ComponentName componentName, Context context) {
-//        if (devicePolicyManager.isAdminActive(componentName)) {
-//            devicePolicyManager.removeActiveAdmin(componentName);
-//            showToast(context, "Device admin removed");
-//        } else {
-//            showToast(context, "Device admin not active");
-//        }
+    public static void removeDeviceAdmin(DevicePolicyManager devicePolicyManager, ComponentName componentName) {
         if (devicePolicyManager.isAdminActive(componentName)) {
             // Reset password policies
             devicePolicyManager.setPasswordQuality(componentName, DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
