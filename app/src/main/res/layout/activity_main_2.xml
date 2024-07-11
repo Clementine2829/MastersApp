@@ -2,15 +2,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/mainMenuToolBar"
+        style="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/gradient"
+        android:paddingTop="@dimen/padding_normal"
+        android:paddingBottom="@dimen/padding_normal"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/titleImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:fadingEdge="horizontal|vertical"
+            android:src="@drawable/logo"
+            android:contentDescription="@string/todo" />
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- RecyclerView to display content -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:paddingTop="@dimen/padding_normal"
+        android:paddingBottom="@dimen/padding_normal"
         android:layout_above="@+id/relativeLayout"
+        android:layout_below="@+id/mainMenuToolBar"
         android:scrollbarStyle="insideOverlay" />
 
     <!-- Buttons at the bottom -->
@@ -18,6 +47,8 @@
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="0dp"
+        android:paddingBottom="@dimen/padding_normal"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 

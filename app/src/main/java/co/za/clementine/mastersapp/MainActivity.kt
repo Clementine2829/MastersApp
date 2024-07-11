@@ -17,6 +17,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -48,6 +49,7 @@ import co.za.clementine.mastersapp.profile.apps.install.AppInstallReceiver
 import co.za.clementine.mastersapp.profiles.switch_between.ProfileSelectionDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Thread.sleep
 import kotlin.system.exitProcess
 
 
@@ -69,6 +71,7 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var adapter: TaskAdapter
+
 
     private val tasks = mutableListOf<Task>()
 
@@ -96,6 +99,10 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_2)
 
+        val toolbar:Toolbar = findViewById(R.id.mainMenuToolBar);
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = ""
+
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         adminComponentName = ComponentName(this, DeviceOwnerReceiver::class.java)
 
@@ -114,7 +121,6 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
         permissionManager.requestNecessaryPermissions()
         wifiPolicyEnforcer = WifiPolicyEnforcer(this, wifiPolicyManager)
         wifiBroadcastReceiver = WifiBroadcastReceiver(this)
-
 
         val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
         registerReceiver(wifiBroadcastReceiver, intentFilter)
@@ -142,8 +148,10 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
             setupAdminTasks()
         } else if (devicePolicyManager.isProfileOwnerApp(packageName)) {
             setupWorkProfileTasks()
+//            checkStatusOfAirDroidInstallation()
         } else {
             setupWorkProfileTasks()
+//            checkStatusOfAirDroidInstallation()
         }
         startTasks()
         val filter = IntentFilter()
@@ -206,11 +214,12 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
     }
 
     private fun gotToTermsAndConditions() {
-        goToMoreInfoActivity(this)
+        goToMoreInfoActivity(this, "")
     }
 
     private fun relaunchMain() {
         goToMainActivity(this)
+        finishAffinity()
     }
 
     private fun confirmAppExit(message: String) {
@@ -434,6 +443,15 @@ class MainActivity : AppCompatActivity(), NetworkMonitor.NetworkStateListener {
             tasks[position].undoVisible = true
         }
         adapter.notifyItemChanged(position)
+    }
+    private fun checkStatusOfAirDroidInstallation(){
+        while (true) {
+            sleep(500)
+            if (ManageWorkProfileInstalledApps(this).isEndpointAirDroidInstalled) {
+                tasks.last().status = TaskEnum.COMPLETED
+                break
+            }
+        }
     }
 
     private fun checkDeviceOwner(savedInstanceState: Bundle?) {

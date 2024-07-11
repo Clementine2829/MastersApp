@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MastersApp</string>
+    <string name="app_name">ShildDroid Enterprise</string>
     <string name="profile_name">MastersApp</string>
     <string name="profile_name_clementine">Clementine </string>
     <string name="enable_admin">Enable Admin</string>
@@ -24,7 +24,7 @@
     <string name="limit_bluetooth_connections">Limit Bluetooth Connections</string>
     <string name="disable_bluetooth_discoverability">Disable Discoverability</string>
     <string name="app_icon_description">App Icon</string>
-    <string name="disclaimer_text">By using this app, you agree to the Terms &amp; Conditions and User Privacy policies. The app has device owner capabilities and can make changes to the device.</string>
+    <string name="disclaimer_text">By using this app, you agree to the Terms &amp; Conditions and User Privacy policies. \nThis application has device owner capabilities and can make changes to the device.</string>
     <string name="agree">Agree</string>
     <string name="cancel">Cancel</string>
     <string name="more_info">More Info</string>
@@ -32,7 +32,7 @@
     <string name="undo">Undo</string>
     <string name="pending">Pending</string>
     <string name="task_name">Task Name</string>
-    <string name="masters_app">Masters App</string>
+<!--    <string name="masters_app">Masters App</string>-->
     <string name="home_page">Home page</string>
     <string name="app_version_1_0_0">App Version: 1.0.0</string>
     <string name="quit_app">Quit app</string>
@@ -40,7 +40,7 @@
     <string name="more_info_content">
         <![CDATA[
         <h2>Terms & Conditions</h2><br>
-        <p>Welcome to Clementine Masters App. By using this app, you agree to the following terms and conditions:</p><br>
+        <p>Welcome to ShildDroid Enterprise. By using this app, you agree to the following terms and conditions:</p><br>
         <ul>
             <li><b>Usage:</b> This app is designed to help you create and switch work profiles on your device. You must use the app in compliance with all applicable laws and regulations.</li>
             <li><b>Device Owner:</b> The app has device owner capabilities and can make changes to the device, such as installing or uninstalling apps, setting device policies, and managing network settings.</li>
@@ -64,16 +64,16 @@
     </string>
     <string name="about_us_content">
         <![CDATA[
-        <h2>About Masters App</h2><br>
+        <h2>About ShildDroid Enterprise</h2><br>
 
         <h3>Our Story</h3>
-        <p>Welcome to the <strong>Masters app</strong>, where innovation meets practicality. As an
+        <p>Welcome to the <strong>ShildDroid Enterprise</strong>, where innovation meets practicality. As an
         academic project developed by Clementine Mamogale, a dedicated student at the University of
         Johannesburg, and under the guidance of Prof. Noluntu Mpekoa, we are passionate about simplifying
         work profile management for users like you.</p><br>
 
         <h3>Our Mission</h3>
-        <p>At Masters App, our mission is clear: to empower professionals by streamlining work
+        <p>At ShildDroid Enterprise, our mission is clear: to empower professionals by streamlining work
         profiles on their devices. We believe that efficient workspaces lead to productivity, and our
         app is designed to make your life easier.</p><br>
 
@@ -107,10 +107,12 @@
         Noluntu Mpekoa.<i>
         ]]>
     </string>
-    <string name="about">About</string>
+    <string name="about">About us</string>
     <string name="refresh">Refresh</string>
     <string name="work_profile">Work profile</string>
     <string name="undo_admin">Undo admin</string>
+    <string name="todo">todo</string>
+    <string name="home">Home</string>
 
 
 </resources>

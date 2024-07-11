@@ -54,7 +54,7 @@ class DeviceOwnerReceiver : DeviceAdminReceiver() {
         val adminComponent = ComponentName(context, DeviceOwnerReceiver::class.java)
 
         // Display a custom lock screen message
-        dpm.setOrganizationName(adminComponent, "Masters App")
+        dpm.setOrganizationName(adminComponent, "ShildDroid Enterprise")
         dpm.setDeviceOwnerLockScreenInfo(
             adminComponent,
             "This device is managed by Masters App. Contact IT for assistance."

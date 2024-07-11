@@ -34,7 +34,7 @@ class DisclaimerActivity : AppCompatActivity() {
             securityManager!!.requestAuthentication(this);
         }
 
-        appIcon.setImageResource(R.drawable.ic_launcher_background)  // Replace with your app icon resource
+        appIcon.setImageResource(R.drawable.logo)
         disclaimerText.text = getString(R.string.disclaimer_text)
 
         btnAgree.setOnClickListener {
@@ -44,20 +44,13 @@ class DisclaimerActivity : AppCompatActivity() {
             showExitConfirmationDialog("Are you sure you want to exit? Canceling will close the app.")
         }
         btnMoreInfo.setOnClickListener {
-            goToMoreInfoActivity(this)
+            goToMoreInfoActivity(this, "disclaimer")
         }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 showExitConfirmationDialog("")
             }
         })
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (!securityManager!!.isUserAuthenticated) {
-            securityManager!!.requestAuthentication(this)
-        }
     }
 
     @Deprecated(

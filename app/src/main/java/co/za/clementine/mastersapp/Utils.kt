@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import co.za.clementine.mastersapp.enrollment.process.Task
 
 class Utils {
     companion object{
@@ -15,13 +16,11 @@ class Utils {
             context.startActivity(Intent(context, MainActivity::class.java))
             context.finishAffinity()
         }
-        fun goToMoreInfoActivity(context: Activity) {
-            context.startActivity(Intent(context, MoreInfoActivity::class.java))
-            context.finishAffinity()
+        fun goToMoreInfoActivity(context: Activity, activeScreen: String) {
+            context.startActivity(Intent(context, MoreInfoActivity::class.java).putExtra("activeScreen", activeScreen))
         }
         fun goToAboutUsActivity(context: Activity) {
             context.startActivity(Intent(context, AboutUs::class.java))
-            context.finishAffinity()
         }
 
         fun confirmPopUpAction(
